@@ -27,11 +27,25 @@ const angularApp = new AngularNodeAppEngine();
 /**
  * Serve static files from /browser
  */
+
+app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+  res.setHeader('Cross-Origin-Resource-Policy', 'same-origin'); // Added!
+  next();
+});
+
 app.use(
   express.static(browserDistFolder, {
     maxAge: '1y',
     index: false,
     redirect: false,
+    // 2. Explicitly force express.static to attach the headers to your compiled JS/Worker files
+    setHeaders: (res, path) => {
+      res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+      res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+      res.setHeader('Cross-Origin-Resource-Policy', 'same-origin'); // Added!
+    }
   }),
 );
 

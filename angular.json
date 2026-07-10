@@ -22,6 +22,16 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@ffmpeg/core/dist/esm",
+                "output": "/ffmpeg-core"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@ffmpeg/ffmpeg/dist/esm",
+                "output": "/ffmpeg-wrapper"
               }
             ],
             "styles": [
@@ -43,8 +53,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "2MB",
+                  "maximumError": "4MB"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -65,6 +75,12 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": {
+            "prebundle": {
+              "exclude": [
+                "@ffmpeg/ffmpeg",
+                "@ffmpeg/util"
+              ]
+            },
             "headers": {
               "Cross-Origin-Opener-Policy": "same-origin",
               "Cross-Origin-Embedder-Policy": "require-corp"
