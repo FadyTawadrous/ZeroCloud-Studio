@@ -1,25 +1,42 @@
-<div class="py-4 text-center">
+<div class="py-4 text-center hero-glow">
+    <!-- Trust Badge -->
+    <div class="trust-badge d-inline-flex align-items-center gap-2 mb-4">
+        <span class="pulse-dot"></span>
+        100% Client-Side &middot; Zero Uploads &middot; Zero Limits
+    </div>
+
     <!-- Hero Section -->
     <h1 class="display-4 fw-bold mb-3 text-gradient">Your Private Media Studio</h1>
-    <p class="lead text-muted mb-5 max-w-custom mx-auto">
+    <p class="lead text-muted mb-2 max-w-custom mx-auto">
         Lightning-fast media conversion powered entirely by your device. No uploads, no servers, no limits.
-        Choose a tool below to get started.
+        Everything runs locally in your browser, ensuring your privacy and security.
     </p>
+    <h3 class="fw-bold mb-4 text-gradient">Choose a tool below to get started</h3>
 
     <!-- Navigation Cards Grid -->
-    <div class="row row-cols-1 row-cols-md-2 g-4 max-w-custom mx-auto text-start">
+    <section aria-label="Conversion tools"
+        class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-4 max-w-grid mx-auto text-start">
 
         <!-- Image Tool Card -->
-        <!-- Image Tool Card -->
         <div class="col">
-            <!-- Changed to <a> tag and added text-decoration-none -->
             <a class="card h-100 modern-card text-decoration-none" routerLink="/images">
-                <div class="card-body p-4 text-body"> <!-- Added text-body to keep text color normal -->
-                    <div class="icon-wrapper mb-3 text-primary">
-                        <!-- SVG omitted for brevity -->
+                <div class="card-body p-4">
+                    <div class="icon-badge icon-badge-primary mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor"
+                            viewBox="0 0 16 16" aria-hidden="true">
+                            <path
+                                d="M4.502 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M14 14.125a1.875 1.875 0 0 1-1.875 1.875H3.875A1.875 1.875 0 0 1 2 14.125V8.625c.429-.204.814-.523 1.125-.92l.983-1.253a.5.5 0 0 1 .803-.021l2.454 2.872a.5.5 0 0 0 .762-.008l1.458-1.748a.5.5 0 0 1 .773 0l3.642 4.38v2.198ZM14 2.875c0-1.036-.84-1.875-1.875-1.875H3.875C2.84 1 2 1.84 2 2.875v3.475a4.2 4.2 0 0 1 1.05-.333v-3.14a.875.875 0 0 1 .875-.875h8.25a.875.875 0 0 1 .875.875v8.25a.875.875 0 0 1-.875.875H12.9v1h1.1a1.875 1.875 0 0 0 1.875-1.875V2.875Z" />
+                        </svg>
                     </div>
-                    <h5 class="card-title fw-bold">Image Converter</h5>
-                    <p class="card-text text-muted">Convert, resize, crop, and compress images instantly using
+                    <h5 class="card-title fw-bold d-flex align-items-center justify-content-between">
+                        Image Converter
+                        <svg class="card-arrow" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                            fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
+                        </svg>
+                    </h5>
+                    <p class="card-text text-muted mb-0">Convert, resize, crop, and compress images instantly using
                         high-performance WebAssembly.</p>
                 </div>
             </a>
@@ -28,12 +45,28 @@
         <!-- Audio Tool Card -->
         <div class="col">
             <a class="card h-100 modern-card text-decoration-none" routerLink="/audio">
-                <div class="card-body p-4 text-body">
-                    <div class="icon-wrapper mb-3 text-success">
-                        <!-- SVG omitted for brevity -->
+                <div class="card-body p-4">
+                    <div class="icon-badge icon-badge-success mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor"
+                            viewBox="0 0 16 16" aria-hidden="true">
+                            <path
+                                d="M11.536 14.01A8.47 8.47 0 0 0 14.026 8a8.47 8.47 0 0 0-2.49-6.01l-.708.707A7.48 7.48 0 0 1 13.025 8c0 2.071-.84 3.946-2.197 5.303l.708.707z" />
+                            <path
+                                d="M10.121 12.596A6.48 6.48 0 0 0 12.025 8a6.48 6.48 0 0 0-1.904-4.596l-.707.707A5.48 5.48 0 0 1 11.025 8a5.48 5.48 0 0 1-1.61 3.89l.706.706z" />
+                            <path
+                                d="M8.707 11.182A4.5 4.5 0 0 0 10.025 8a4.5 4.5 0 0 0-1.318-3.182L8 5.525A3.5 3.5 0 0 1 9.025 8 3.5 3.5 0 0 1 8 10.475l.707.707zM6.717 3.55A.5.5 0 0 1 7 4v8a.5.5 0 0 1-.812.39L3.825 10.5H1.5A.5.5 0 0 1 1 10V6a.5.5 0 0 1 .5-.5h2.325l2.363-1.89a.5.5 0 0 1 .529-.06z" />
+                        </svg>
                     </div>
-                    <h5 class="card-title fw-bold">Audio Workshop</h5>
-                    <p class="card-text text-muted">Trim tracks, compress files, and convert between modern and legacy
+                    <h5 class="card-title fw-bold d-flex align-items-center justify-content-between">
+                        Audio Workshop
+                        <svg class="card-arrow" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                            fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
+                        </svg>
+                    </h5>
+                    <p class="card-text text-muted mb-0">Trim tracks, compress files, and convert between modern and
+                        legacy
                         audio formats natively.</p>
                 </div>
             </a>
@@ -42,12 +75,23 @@
         <!-- Video Tool Card -->
         <div class="col">
             <a class="card h-100 modern-card text-decoration-none" routerLink="/video">
-                <div class="card-body p-4 text-body">
-                    <div class="icon-wrapper mb-3 text-danger">
-                        <!-- SVG omitted for brevity -->
+                <div class="card-body p-4">
+                    <div class="icon-badge icon-badge-danger mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor"
+                            viewBox="0 0 16 16" aria-hidden="true">
+                            <path
+                                d="M0 12V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm6.79-6.907A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z" />
+                        </svg>
                     </div>
-                    <h5 class="card-title fw-bold">Video Transcoder</h5>
-                    <p class="card-text text-muted">Harness hardware-accelerated WebCodecs to compress, resize, and
+                    <h5 class="card-title fw-bold d-flex align-items-center justify-content-between">
+                        Video Transcoder
+                        <svg class="card-arrow" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                            fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
+                        </svg>
+                    </h5>
+                    <p class="card-text text-muted mb-0">Harness hardware-accelerated WebCodecs to compress, resize, and
                         extract audio from videos.</p>
                 </div>
             </a>
@@ -56,16 +100,28 @@
         <!-- PDF Tool Card -->
         <div class="col">
             <a class="card h-100 modern-card text-decoration-none" routerLink="/pdf">
-                <div class="card-body p-4 text-body">
-                    <div class="icon-wrapper mb-3 text-warning">
-                        <!-- SVG omitted for brevity -->
+                <div class="card-body p-4">
+                    <div class="icon-badge icon-badge-warning mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="currentColor"
+                            viewBox="0 0 16 16" aria-hidden="true">
+                            <path
+                                d="M4 0h5.293A1 1 0 0 1 10 .293L13.707 4a1 1 0 0 1 .293.707V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm5.5 1.5v2a1 1 0 0 0 1 1h2l-3-3zM5.5 6a.5.5 0 0 0-.5.5v5a.5.5 0 0 0 1 0v-2h1.5a1.5 1.5 0 0 0 0-3h-2zm1.5 2h-1v-1h1a.5.5 0 0 1 0 1z" />
+                        </svg>
                     </div>
-                    <h5 class="card-title fw-bold">Document Utilities</h5>
-                    <p class="card-text text-muted">Merge, split, reorganize, and convert PDFs locally without
-                        exposing sensitive data.</p>
+                    <h5 class="card-title fw-bold d-flex align-items-center justify-content-between">
+                        Document Utilities
+                        <svg class="card-arrow" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                            fill="currentColor" viewBox="0 0 16 16" aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
+                        </svg>
+                    </h5>
+                    <p class="card-text text-muted mb-0">Merge, split, reorganize, and convert PDFs locally without
+                        exposing
+                        sensitive data.</p>
                 </div>
             </a>
         </div>
 
-    </div>
+    </section>
 </div>

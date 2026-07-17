@@ -14,6 +14,7 @@ export class App implements OnInit {
   private platformId = inject(PLATFORM_ID);
   isDarkMode = false;
   isNavCollapsed = true;
+  protected readonly currentYear = new Date().getFullYear();
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
