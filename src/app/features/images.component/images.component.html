@@ -1,162 +1,184 @@
-<div class="row justify-content-center">
-    <div class="col-lg-8">
-        <div class="card modern-card p-4 shadow-sm border-0" style="background-color: var(--nav-bg);">
-            <div class="card-body">
+<div class="container max-w-custom mx-auto py-5">
 
-                <div class="d-flex align-items-center gap-3 mb-4">
-                    <div class="icon-badge icon-badge-primary">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                            viewBox="0 0 16 16" aria-hidden="true">
-                            <path
-                                d="M4.502 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M14 14.125a1.875 1.875 0 0 1-1.875 1.875H3.875A1.875 1.875 0 0 1 2 14.125V8.625c.429-.204.814-.523 1.125-.92l.983-1.253a.5.5 0 0 1 .803-.021l2.454 2.872a.5.5 0 0 0 .762-.008l1.458-1.748a.5.5 0 0 1 .773 0l3.642 4.38v2.198ZM14 2.875c0-1.036-.84-1.875-1.875-1.875H3.875C2.84 1 2 1.84 2 2.875v3.475a4.2 4.2 0 0 1 1.05-.333v-3.14a.875.875 0 0 1 .875-.875h8.25a.875.875 0 0 1 .875.875v8.25a.875.875 0 0 1-.875.875H12.9v1h1.1a1.875 1.875 0 0 0 1.875-1.875V2.875Z" />
-                        </svg>
+    <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold mb-3">
+            <span class="animated-gradient-text">Image Studio</span>
+        </h2>
+        <p class="lead text-muted">Professional grade photo editing and conversion, strictly locally.</p>
+    </div>
+
+    @if (error) {
+    <div class="alert alert-danger shadow-sm rounded-4 mb-4" role="alert">
+        {{ error }}
+    </div>
+    }
+
+    <!-- 1. Upload Zone -->
+    @if (!selectedFile) {
+    <app-drop-zone [acceptAttr]="'image/png, image/jpeg, image/webp, image/bmp, image/tiff'"
+        [title]="'Click or drag an image here'" [subtitle]="'Supports PNG, JPG, WebP, AVIF, TIFF'"
+        (fileSelected)="onFileSelected($event)">
+    </app-drop-zone>
+    }
+
+    @if (selectedFile) {
+    <!-- 2. The Selected File Card -->
+    <div class="card modern-card p-3 mb-4 d-flex flex-row align-items-center gap-3">
+        <img [src]="previewUrl" alt="Preview" class="file-preview-thumb">
+        <div class="flex-grow-1 min-w-0">
+            <p class="fw-bold mb-0 text-truncate">{{ selectedFile.name }}</p>
+            <p class="text-muted small mb-0">{{ originalSizeBytes | fileSize }}</p>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-medium" (click)="removeFile()">
+            Remove
+        </button>
+    </div>
+
+    <!-- 3. Conversion Settings Bento Grid -->
+    <div class="row g-4 mb-4">
+
+        <!-- Left Column: Core Format -->
+        <div class="col-md-6">
+            <div class="card modern-card p-4 h-100">
+                <h6 class="fw-bold mb-3 text-muted">Output Format</h6>
+                <app-format-selector [options]="availableFormats" [selectedFormat]="options.format" label=""
+                    (selectionChange)="onFormatChange($event)">
+                </app-format-selector>
+
+                <label class="form-label fw-bold text-muted small mt-4 mb-2 tracking-wide text-uppercase">
+                    Quality: {{ options.quality }}%
+                </label>
+                <input type="range" class="form-range custom-range" min="10" max="100" [(ngModel)]="options.quality"
+                    [disabled]="options.format === 'PNG'">
+
+                <!-- Presets Dropdown -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold text-muted small mt-4 mb-2 tracking-wide text-uppercase">Use
+                        Preset</label>
+                    <select class="form-select modern-select" (change)="applyPreset($event)">
+                        <option value="">Custom Size</option>
+                        @for (p of presets; track p.name) {
+                        <option [value]="p.name">{{ p.name }}</option>
+                        }
+                    </select>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Right Column: Tools -->
+        <div class="col-md-6">
+            <div class="card modern-card p-4 h-100">
+                <h6 class="fw-bold mb-3 text-muted">Advanced Tools</h6>
+
+                <div class="mb-3">
+                    <label class="form-label small fw-medium">Apply Filter</label>
+                    <select class="form-select modern-select" [(ngModel)]="options.filter">
+                        <option value="none">None (Original)</option>
+                        <option value="grayscale">Grayscale</option>
+                        <option value="sepia">Sepia</option>
+                        <option value="vintage">Vintage</option>
+                        <option value="invert">Invert Colors</option>
+                        <option value="blur">Gaussian Blur</option>
+                        <option value="sharpen">Sharpen Image</option>
+                    </select>
+                </div>
+
+                <!-- Resize & Lock -->
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-end mb-0">
+                        <label class="form-label small fw-medium mb-0">Resize (px)</label>
+                        <!-- Original Badge -->
+                        <span class="text-muted small">Original: {{ originalWidth }}x{{ originalHeight }}</span>
                     </div>
-                    <h2 class="fw-bold text-gradient mb-0">Image Studio</h2>
-                </div>
 
-                @if (error) {
-                <div class="notice notice--error mb-4" role="alert">
-                    {{ error }}
-                </div>
-                }
+                    <div class="d-flex gap-2 align-items-center">
+                        <label class="form-label small fw-medium mb-0">Width:</label>
+                        <input type="number" class="form-control modern-input" [(ngModel)]="resizeWidth"
+                            (ngModelChange)="onWidthChanged()" placeholder="Width">
+                        <label class="form-label small fw-medium mb-0">Height:</label>
+                        <input type="number" class="form-control modern-input" [(ngModel)]="resizeHeight"
+                            (ngModelChange)="onHeightChanged()" placeholder="Height">
 
-                <!-- Upload Zone / File Preview -->
-                @if (!selectedFile) {
-                <div class="upload-zone" [class.upload-zone--active]="isDragging" (click)="triggerFilePicker()"
-                    (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)"
-                    role="button" tabindex="0" (keydown.enter)="triggerFilePicker()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor"
-                        viewBox="0 0 16 16" aria-hidden="true" class="mb-2 text-muted">
-                        <path
-                            d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
-                        <path
-                            d="M7.646.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 1.707V11.5a.5.5 0 0 1-1 0V1.707L5.354 3.854a.5.5 0 1 1-.708-.708z" />
-                    </svg>
-                    <p class="fw-medium mb-1">Click to upload or drag and drop</p>
-                    <p class="text-muted small mb-0">PNG, JPEG, or WebP</p>
-                    <input #fileInput type="file" class="d-none" accept="image/png, image/jpeg, image/webp"
-                        (change)="onFileSelected($event)">
-                </div>
-                } @else {
-                <div class="file-preview-card mb-4">
-                    <img [src]="previewUrl" alt="" class="file-preview-thumb">
-                    <div class="flex-grow-1 min-w-0">
-                        <p class="fw-medium mb-1 text-truncate">{{ selectedFile.name }}</p>
-                        <p class="text-muted small mb-0">{{ formatBytes(originalSizeBytes) }}</p>
-                    </div>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="removeFile()">
-                        Remove
-                    </button>
-                </div>
-                }
-
-                @if (selectedFile) {
-                <!-- 2. Core Settings -->
-                <div class="row g-3 mb-4 p-3 rounded" style="background-color: var(--hover-bg);">
-                    <div class="col-md-6">
-                        <label class="form-label fw-medium small">Target Format</label>
-                        <select class="form-select" [(ngModel)]="options.format">
-                            <option value="png">PNG (Lossless)</option>
-                            <option value="jpeg">JPEG (Compressed)</option>
-                            <option value="webp">WebP (Modern)</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <!-- <label class="form-label fw-medium small">Quality: {{ options.quality }}%</label>
-                        <input type="range" class="form-range" min="10" max="100" [(ngModel)]="options.quality"
-                            [disabled]="options.format === 'png'"> -->
-                    </div>
-                </div>
-
-                <!-- 3. Advanced Tools -->
-                <div class="mb-4 p-3 rounded border" style="border-color: var(--bs-border-color) !important;">
-                    <h6 class="fw-bold mb-3 text-muted">Advanced Tools (Optional)</h6>
-
-                    <!-- Resize & Aspect Ratio -->
-                    <div class="row align-items-end mb-3">
-                        <div class="col-sm-5">
-                            <label class="form-label small">Width (px)</label>
-                            <input type="number" class="form-control" min="1" [(ngModel)]="resizeWidth"
-                                (ngModelChange)="onWidthChanged()">
-                        </div>
-
-                        <div class="col-sm-2 text-center pb-1">
-                            <button class="btn btn-sm" [class.btn-primary]="lockRatio"
-                                [class.btn-outline-secondary]="!lockRatio" (click)="toggleRatioLock()"
-                                title="Lock Aspect Ratio">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        <!-- Controls: Lock + Reset -->
+                        <div class="d-flex flex-column gap-1">
+                            <button class="btn btn-sm text-muted lock-btn" [class.text-primary]="lockRatio"
+                                (click)="toggleRatioLock()" title="Lock Aspect Ratio">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
                                     viewBox="0 0 16 16">
+                                    @if(lockRatio) {
                                     <path
-                                        d="M4.5 9a3.5 3.5 0 1 0 0 7h7a3.5 3.5 0 1 0 0-7h-7Zm7 6a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Zm-7 0a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z" />
+                                        d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
+                                    }
+                                    @else {
                                     <path
-                                        d="M5.273 11.026a.5.5 0 0 1 .714-.148l3.05 2.2a.5.5 0 1 1-.586.812l-3.05-2.2a.5.5 0 0 1-.128-.664Z" />
+                                        d="M11 1a2 2 0 0 0-2 2v4a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h5V3a3 3 0 0 1 6 0v4a.5.5 0 0 1-1 0V3a2 2 0 0 0-2-2z" />
+                                    }
+                                </svg>
+                            </button>
+                            <button class="btn btn-sm text-muted lock-btn" (click)="resetDimensions()"
+                                title="Reset to Original">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor"
+                                    viewBox="0 0 16 16">
+                                    <path d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z" />
+                                    <path
+                                        d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z" />
                                 </svg>
                             </button>
                         </div>
-
-                        <div class="col-sm-5">
-                            <label class="form-label small">Height (px)</label>
-                            <input type="number" class="form-control" min="1" [(ngModel)]="resizeHeight"
-                                (ngModelChange)="onHeightChanged()">
-                        </div>
-                    </div>
-
-                    <!-- Filters & Watermark -->
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label small">Apply Filter</label>
-                            <select class="form-select" [(ngModel)]="options.filter">
-                                <option value="none">None</option>
-                                <option value="grayscale">Grayscale</option>
-                                <option value="sepia">Sepia</option>
-                                <option value="vintage">Vintage</option>
-                                <option value="invert">Invert Colors</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <!-- <label class="form-label small">Watermark Text</label>
-                            <input type="text" class="form-control" placeholder="e.g., Copyright 2026"
-                                [(ngModel)]="options.watermark"> -->
-                        </div>
                     </div>
                 </div>
 
-                <!-- Action Button -->
-                <button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm"
-                    style="background-color: var(--accent-color); border: none;" (click)="convertImage()"
-                    [disabled]="isProcessing">
-                    @if (isProcessing) {
-                    <span class="spinner-border spinner-border-sm me-2"></span> Processing locally...
-                    } @else {
-                    Execute Pipeline
-                    }
-                </button>
-                }
-
-                <!-- Download Result -->
-                @if (downloadUrl) {
-                <div class="result-card mt-4">
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
-                        <div class="d-flex align-items-center gap-3">
-                            <img [src]="downloadUrl" alt="" class="file-preview-thumb">
-                            <div>
-                                <p class="fw-medium mb-1">{{ formatBytes(originalSizeBytes) }} &rarr; {{
-                                    formatBytes(outputSizeBytes) }}</p>
-                                @if (sizeChangePercent > 0) {
-                                <p class="text-success small mb-0 fw-medium">{{ sizeChangePercent }}% smaller</p>
-                                } @else if (sizeChangePercent < 0) { <p class="text-muted small mb-0">{{
-                                    -sizeChangePercent }}% larger</p>
-                                    }
-                            </div>
-                        </div>
-                        <a [href]="downloadUrl" [download]="outputFilename" class="btn btn-success fw-medium px-4 py-2">
-                            Download Output
-                        </a>
+                <div class="mb-3">
+                    <label class="form-label small fw-medium">Crop (X, Y, W, H)</label>
+                    <div class="row g-2">
+                        <div class="col-3"><input type="number" class="form-control modern-input" [(ngModel)]="crop.x"
+                                placeholder="X"></div>
+                        <div class="col-3"><input type="number" class="form-control modern-input" [(ngModel)]="crop.y"
+                                placeholder="Y"></div>
+                        <div class="col-3"><input type="number" class="form-control modern-input"
+                                [(ngModel)]="crop.width" placeholder="W"></div>
+                        <div class="col-3"><input type="number" class="form-control modern-input"
+                                [(ngModel)]="crop.height" placeholder="H"></div>
                     </div>
                 </div>
-                }
 
             </div>
         </div>
     </div>
+
+    <!-- 4. Execute Button -->
+    <button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm rounded-pill py-3 action-btn mb-4"
+        (click)="convertImage()" [disabled]="isProcessing">
+        @if (isProcessing) {
+        <span class="spinner-border spinner-border-sm me-2"></span> Processing in WASM Engine...
+        } @else {
+        Execute Pipeline
+        }
+    </button>
+    }
+
+    <!-- 5. Download Result Card -->
+    @if (downloadUrl) {
+    <div class="card modern-card p-4 mt-2 border-success result-card">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <img [src]="downloadUrl" alt="Result" class="file-preview-thumb border border-success">
+                <div>
+                    <p class="fw-bold mb-1">{{ originalSizeBytes | fileSize }} &rarr; {{ outputSizeBytes | fileSize }}
+                    </p>
+                    @if (sizeChangePercent > 0) {
+                    <p class="text-success small fw-bold mb-0">Saved {{ sizeChangePercent }}% space!</p>
+                    } @else if (sizeChangePercent < 0) { <p class="text-warning small fw-bold mb-0">{{
+                        -sizeChangePercent }}% larger (Quality increase)</p>
+                        }
+                </div>
+            </div>
+            <a [href]="downloadUrl" [download]="outputFilename"
+                class="btn btn-success rounded-pill fw-bold px-4 py-2 shadow-sm">
+                Download Output
+            </a>
+        </div>
+    </div>
+    }
 </div>

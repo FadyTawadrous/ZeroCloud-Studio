@@ -1,18 +1,20 @@
 /// <reference lib="webworker" />
+
 // 1. Import the default initialization function as 'init'
 import init, * as photon from '@silvia-odwyer/photon';
+import { ImageConversionOptions } from '../../core/interfaces/iimage-converter';
 
 // Keep track of initialization so we only boot the WASM engine once per session
 let wasmInitialized = false;
 
 addEventListener('message', async (event: MessageEvent) => {
-  const { file, options } = event.data;
+  const { file, options }: { file: File, options: ImageConversionOptions } = event.data;
 
   try {
     // 2. EXPLICITLY BOOT THE WEBASSEMBLY ENGINE
     if (!wasmInitialized) {
-      // Pass the configuration as an object to satisfy modern wasm-bindgen requirements
-      await init({ module_or_path: '/photon_rs_bg.wasm' }); 
+      // Pointing to the public folder where we will store the raw WASM binary
+      await init({ module_or_path: '/wasm/photon_rs_bg.wasm' });
       wasmInitialized = true;
     }
 
@@ -20,13 +22,31 @@ addEventListener('message', async (event: MessageEvent) => {
     const arrayBuffer = await file.arrayBuffer();
     const bytes = new Uint8Array(arrayBuffer);
 
-    // 2. Decode the image using the newly initialized Photon Rust/WASM engine
+    // 2. Decode the image using the initialized Photon Rust/WASM engine
     let img = photon.PhotonImage.new_from_byteslice(bytes);
 
-    // 3. Pipeline Step: Resize
+    // 3. Pipeline Step: Resize with Aspect Ratio support
     if (options.resize) {
-      const resized = photon.resize(img, options.resize.width, options.resize.height, 5);
-      img.free();
+      const origWidth = img.get_width();
+      const origHeight = img.get_height();
+
+      let targetWidth = options.resize.width || origWidth;
+      let targetHeight = options.resize.height || origHeight;
+
+      // Calculate missing dimensions if the user wants proportional scaling
+      if (options.resize.maintainAspectRatio) {
+        const aspect = origWidth / origHeight;
+
+        if (options.resize.width && !options.resize.height) {
+          targetHeight = Math.round(options.resize.width / aspect);
+        } else if (options.resize.height && !options.resize.width) {
+          targetWidth = Math.round(options.resize.height * aspect);
+        }
+      }
+
+      // 5 is the 'Lanczos3' algorithm in Photon — the highest quality resampling filter
+      const resized = photon.resize(img, targetWidth, targetHeight, 5);
+      img.free(); // Free the old image from WASM memory
       img = resized;
     }
 
@@ -52,12 +72,19 @@ addEventListener('message', async (event: MessageEvent) => {
         case 'vintage':
           photon.filter(img, 'twenties');
           break;
+        case 'blur':
+          photon.gaussian_blur(img, 1); // 1 is the blur radius
+          break;
+        case 'sharpen':
+          photon.sharpen(img);
+          break;
       }
     }
 
     // 6. Pipeline Step: Watermark Text
-    if (options.watermark) {
-      photon.draw_text(img, options.watermark, 10, 30, 20);
+    if (options.watermarkText) {
+      // draw_text(img, text, x, y, font_size)
+      photon.draw_text(img, options.watermarkText, 10, 30, 20);
     }
 
     // 7. Extract the final computed pixels directly as a native ImageData object
@@ -80,7 +107,11 @@ addEventListener('message', async (event: MessageEvent) => {
     ctx.putImageData(imageData, 0, 0);
 
     // 9. Format mapping and native browser compression
-    const mimeType = options.format === 'jpeg' ? 'image/jpeg' : `image/${options.format}`;
+    // Convert our uppercase strict types ('JPG', 'WEBP') to valid mime types
+    const fmt = options.format.toLowerCase();
+    const mimeType = (fmt === 'jpg' || fmt === 'jpeg') ? 'image/jpeg' : `image/${fmt}`;
+
+    // Default to 0.8 (80%) quality if compression is lossy and no quality was specified
     const compressionRatio = options.quality ? options.quality / 100 : 0.8;
 
     const finalBlob = await canvas.convertToBlob({

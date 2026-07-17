@@ -1,26 +1,35 @@
-import { Component, ElementRef, OnDestroy, ViewChild, inject } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PhotonService } from '../../core/services/images/photon-service';
 import { ImageConversionOptions } from '../../core/interfaces/iimage-converter';
+import { ImageOutputFormat } from '../../core/constants/supported-formats';
+import { DropZone } from '../../shared/components/drop-zone/drop-zone';
+import { FormatSelector, FormatOption } from '../../shared/components/format-selector/format-selector';
+// Make sure this path matches where you saved your pipe
+import { FileSizePipe } from '../../shared/pipes/file-size-pipe';
 
-const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
-const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024; // 50MB — Photon loads the whole image into memory
+const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
+
+interface ResizePreset {
+  name: string;
+  format: ImageOutputFormat;
+  width: number;
+  height: number;
+}
 
 @Component({
-  selector: 'app-images.component',
-  imports: [CommonModule, FormsModule],
+  selector: 'app-images',
+  standalone: true,
+  imports: [CommonModule, FormsModule, DropZone, FormatSelector, FileSizePipe],
   templateUrl: './images.component.html',
   styleUrl: './images.component.css',
 })
 export class ImagesComponent implements OnDestroy {
   private imageService = inject(PhotonService);
 
-  @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
-
   selectedFile: File | null = null;
   isProcessing = false;
-  isDragging = false;
   error: string | null = null;
 
   previewUrl: string | null = null;
@@ -30,12 +39,21 @@ export class ImagesComponent implements OnDestroy {
   outputFilename = '';
   outputSizeBytes = 0;
 
-  // Pipeline Options
+  // Pipeline Options mapped to our strict interface
   options: ImageConversionOptions = {
     format: 'WEBP',
     quality: 80,
     filter: 'none'
   };
+
+  // Configure the UI Format Selector options
+  availableFormats: FormatOption[] = [
+    { id: 'PNG', label: 'PNG (Lossless)', group: 'Standard' },
+    { id: 'JPG', label: 'JPEG (Compressed)', group: 'Standard' },
+    { id: 'WEBP', label: 'WebP (Modern Web)', group: 'Web-Friendly' },
+    { id: 'AVIF', label: 'AVIF (Ultra Compressed)', group: 'Web-Friendly' },
+    { id: 'ICO', label: 'ICO (Favicon)', group: 'Icons' }
+  ];
 
   // Resize State
   resizeWidth: number | null = null;
@@ -43,50 +61,27 @@ export class ImagesComponent implements OnDestroy {
   originalAspectRatio = 1;
   lockRatio = true;
 
+  crop = { x: 0, y: 0, width: 0, height: 0 };
+
+  originalWidth = 0;
+  originalHeight = 0;
+
+  // Preset Resize Options for common social media and web use cases
+  presets: ResizePreset[] = [
+    { name: 'Instagram Square (1080x1080)', format: 'JPEG', width: 1080, height: 1080 },
+    { name: 'Facebook Cover (820x312)', format: 'JPEG', width: 820, height: 312 },
+    { name: 'YouTube Thumbnail (1280x720)', format: 'JPEG', width: 1280, height: 720 },
+    { name: 'Profile Picture (400x400)', format: 'JPEG', width: 400, height: 400 },
+  ];
+
   ngOnDestroy(): void {
     this.revokePreviewUrl();
     this.revokeDownloadUrl();
   }
 
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    input.value = ''; // allow re-selecting the same file later
-    if (file) {
-      this.handleFile(file);
-    }
-  }
-
-  onDragOver(event: DragEvent) {
-    event.preventDefault();
-    this.isDragging = true;
-  }
-
-  onDragLeave(event: DragEvent) {
-    event.preventDefault();
-    this.isDragging = false;
-  }
-
-  onDrop(event: DragEvent) {
-    event.preventDefault();
-    this.isDragging = false;
-    const file = event.dataTransfer?.files?.[0];
-    if (file) {
-      this.handleFile(file);
-    }
-  }
-
-  triggerFilePicker() {
-    this.fileInputRef.nativeElement.click();
-  }
-
-  private handleFile(file: File) {
+  // Receives the File object directly from our DropZone component
+  onFileSelected(file: File) {
     this.error = null;
-
-    if (!ACCEPTED_TYPES.includes(file.type)) {
-      this.error = 'Unsupported file type. Please choose a PNG, JPEG, or WebP image.';
-      return;
-    }
 
     if (file.size > MAX_FILE_SIZE_BYTES) {
       const maxMb = Math.round(MAX_FILE_SIZE_BYTES / (1024 * 1024));
@@ -113,13 +108,22 @@ export class ImagesComponent implements OnDestroy {
     this.error = null;
   }
 
-  // Read the file to get its natural width/height for the aspect ratio math
+  onFormatChange(newFormat: string) {
+    this.options.format = newFormat as ImageOutputFormat;
+  }
+
   private extractImageMetadata(file: File) {
     const img = new Image();
     const objectUrl = URL.createObjectURL(file);
     img.onload = () => {
+      // Store originals persistently
+      this.originalWidth = img.width;
+      this.originalHeight = img.height;
+
+      // Initialize current resize values to the originals
       this.resizeWidth = img.width;
       this.resizeHeight = img.height;
+
       this.originalAspectRatio = img.width / img.height;
       URL.revokeObjectURL(objectUrl);
     };
@@ -128,7 +132,6 @@ export class ImagesComponent implements OnDestroy {
 
   toggleRatioLock() {
     this.lockRatio = !this.lockRatio;
-    // If turning back on, snap the height to match the current width
     if (this.lockRatio && this.resizeWidth) {
       this.onWidthChanged();
     }
@@ -152,7 +155,6 @@ export class ImagesComponent implements OnDestroy {
     this.error = null;
     this.revokeDownloadUrl();
 
-    // Map UI resize values back to the options object if they exist
     if (this.resizeWidth && this.resizeHeight) {
       this.options.resize = { width: this.resizeWidth, height: this.resizeHeight };
     } else {
@@ -164,10 +166,9 @@ export class ImagesComponent implements OnDestroy {
       this.downloadUrl = URL.createObjectURL(processedBlob);
       this.outputSizeBytes = processedBlob.size;
       const originalName = this.selectedFile.name.split('.')[0];
-      this.outputFilename = `${originalName}-converted.${this.options.format}`;
-    } catch (error) {
-      console.error('Conversion failed:', error);
-      this.error = 'Failed to convert this image. Please try a different file or settings.';
+      this.outputFilename = `${originalName}-converted.${this.options.format.toLowerCase()}`;
+    } catch (error: any) {
+      this.error = error.message || 'Failed to convert this image.';
     } finally {
       this.isProcessing = false;
     }
@@ -187,16 +188,25 @@ export class ImagesComponent implements OnDestroy {
     }
   }
 
-  formatBytes(bytes: number): string {
-    if (bytes <= 0) return '0 KB';
-    const units = ['B', 'KB', 'MB', 'GB'];
-    const exponent = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);
-    const value = bytes / Math.pow(1024, exponent);
-    return `${value.toFixed(exponent === 0 ? 0 : 1)} ${units[exponent]}`;
-  }
-
   get sizeChangePercent(): number {
     if (!this.originalSizeBytes || !this.outputSizeBytes) return 0;
     return Math.round((1 - this.outputSizeBytes / this.originalSizeBytes) * 100);
   }
+
+  applyPreset(event: any) {
+    const preset = this.presets.find(p => p.name === event.target.value);
+    if (preset) {
+      this.resizeWidth = preset.width;
+      this.resizeHeight = preset.height;
+      this.lockRatio = false; // Usually presets define fixed aspect ratios
+      this.options.format = preset.format;
+      this.options.quality = 90; // Reset quality to default for presets
+    }
+  }
+
+  resetDimensions() {
+    this.resizeWidth = this.originalWidth;
+    this.resizeHeight = this.originalHeight;
+  }
+
 }
