@@ -1,78 +1,29 @@
-import { Injectable, signal, Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { Injectable, signal, inject } from '@angular/core';
+
+// We will build these specialized services next
+// import { VideoService } from './video/video.service';
+// import { ImageService } from './images/image.service';
+// import { AudioService } from './audio/audio.service';
+// import { PdfService } from './pdf/pdf.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ConversionService {
-  private worker: Worker | null = null;
-  private isBrowser: boolean;
-
+  // Signals that the ConverterComponent will bind to
   public status = signal<string>('Idle');
   public progress = signal<number>(0);
   public isProcessing = signal<boolean>(false);
   public error = signal<string | null>(null);
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
-    this.isBrowser = isPlatformBrowser(this.platformId);
-    // Worker is now initialized lazily on first processFile() call,
-    // not eagerly here, to avoid loading the ffmpeg core on every route.
-  }
+  // Injected specialized services (commented out until we build them)
+  // private videoService = inject(VideoService);
+  // private imageService = inject(ImageService);
+  // private audioService = inject(AudioService);
+  // private pdfService = inject(PdfService);
 
-  private initWorker(): boolean {
-    if (!this.isBrowser) {
-      return false;
-    }
-
-    if (typeof Worker === 'undefined') {
-      this.error.set('Web Workers are not supported in this browser.');
-      return false;
-    }
-
-    if (this.worker) {
-      return true; // already initialized
-    }
-
-    this.worker = new Worker(
-      new URL('../../features/converter.component/converter.worker.ts', import.meta.url),
-      { type: 'module' }
-    );
-
-    this.worker.onmessage = ({ data }) => {
-      switch (data.type) {
-        case 'status':
-          this.status.set(data.value);
-          break;
-        case 'progress':
-          this.progress.set(data.value);
-          break;
-        case 'error':
-          this.error.set(data.value);
-          this.isProcessing.set(false);
-          break;
-        case 'complete':
-          this.handleDownload(data.fileData, data.fileName, data.mimeType);
-          this.status.set('Done!');
-          this.isProcessing.set(false);
-          break;
-        case 'log':
-          // You can wire this to a UI signal later if you want a debug panel
-          console.log('[FFmpeg Worker]:', data.value);
-          break;
-      }
-    };
-
-    this.worker.onerror = (err) => {
-      this.error.set(`Worker error: ${err.message}`);
-      this.isProcessing.set(false);
-      // Worker is likely in a bad state after an uncaught error; drop it
-      // so the next processFile() call creates a fresh one.
-      this.worker?.terminate();
-      this.worker = null;
-    };
-
-    return true;
-  }
+  // Keep track of which service is currently running so we can cancel it
+  private activeServiceType: 'video' | 'image' | 'audio' | 'pdf' | null = null;
 
   public processFile(file: File, formatFrom: string, formatTo: string) {
     if (this.isProcessing()) {
@@ -80,33 +31,110 @@ export class ConversionService {
       return;
     }
 
-    const ready = this.initWorker();
-    if (!ready || !this.worker) {
-      return; // error signal already set (unsupported / SSR / init failure)
+    this.resetState();
+    this.isProcessing.set(true);
+
+    const type = this.determineCategory(formatFrom);
+
+    try {
+      switch (type) {
+        case 'video':
+          this.activeServiceType = 'video';
+          // NOTE: We will wire this up to the VideoService next
+          this.simulateWork('VideoEngine', formatFrom, formatTo, file);
+          break;
+        case 'image':
+          this.activeServiceType = 'image';
+          // this.imageService.convert(file, options);
+          this.simulateWork('Photon Engine', formatFrom, formatTo, file);
+          break;
+        case 'audio':
+          this.activeServiceType = 'audio';
+          // this.audioService.convert(file, options);
+          this.simulateWork('AudioEngine', formatFrom, formatTo, file);
+          break;
+        case 'pdf':
+          this.activeServiceType = 'pdf';
+          // this.pdfService.process([file], options);
+          this.simulateWork('PDF Engine', formatFrom, formatTo, file);
+          break;
+        default:
+          this.error.set(`Processing for ${formatFrom} is not implemented yet.`);
+          this.isProcessing.set(false);
+      }
+    } catch (err: any) {
+      this.error.set(err.message || 'An error occurred routing the file.');
+      this.isProcessing.set(false);
+    }
+  }
+
+  public cancel() {
+    if (!this.isProcessing()) return;
+
+    // Route the cancellation to the active service
+    switch (this.activeServiceType) {
+      case 'video':
+        // this.videoService.cancel();
+        break;
+      case 'image':
+        // this.imageService.cancel();
+        break;
+      // ... same for others
     }
 
-    this.isProcessing.set(true);
-    this.error.set(null);
-    this.progress.set(0);
-    this.status.set('Starting worker...');
+    this.isProcessing.set(false);
+    this.status.set('Cancelled');
+    this.activeServiceType = null;
+  }
 
-    this.worker.postMessage({ file, formatFrom, formatTo });
+  public resetState() {
+    this.error.set(null);
+    this.status.set('Idle');
+    this.progress.set(0);
+  }
+
+  // --- Helpers ---
+
+  private determineCategory(format: string): 'video' | 'image' | 'audio' | 'pdf' | 'unknown' {
+    const f = format.toUpperCase();
+    if (['MP4', 'WEBM', 'MOV', 'MKV', 'AV1'].includes(f)) return 'video';
+    if (['PNG', 'JPG', 'JPEG', 'WEBP', 'AVIF', 'ICO', 'BMP', 'TIFF'].includes(f)) return 'image';
+    if (['MP3', 'WAV', 'OGG', 'FLAC', 'AAC', 'OPUS'].includes(f)) return 'audio';
+    if (['PDF'].includes(f)) return 'pdf';
+    return 'unknown';
   }
 
   /**
-   * Cancels the current job and tears down the worker, releasing the
-   * WASM memory it was holding. A new worker is created lazily on the
-   * next processFile() call.
+   * TEMPORARY: Simulates processing so the UI works while we build the actual engines.
    */
-  public cancel() {
-    this.worker?.terminate();
-    this.worker = null;
-    this.isProcessing.set(false);
-    this.status.set('Cancelled');
+  private simulateWork(engineName: string, from: string, to: string, file: File) {
+    this.status.set(`Initializing ${engineName}...`);
+    let p = 0;
+
+    const interval = setInterval(() => {
+      p += 10;
+      this.progress.set(p);
+      this.status.set(`Transcoding ${from} to ${to}...`);
+
+      if (p >= 100) {
+        clearInterval(interval);
+        if (this.isProcessing()) {
+          this.status.set('Done!');
+          this.isProcessing.set(false);
+          this.activeServiceType = null;
+
+          // Create a dummy Blob for the simulation
+          const dummyBlob = new Blob(['simulated data'], { type: 'application/octet-stream' });
+          this.handleDownload(dummyBlob, `converted.${to.toLowerCase()}`);
+        }
+      }
+    }, 200);
   }
 
-  private handleDownload(data: Uint8Array<ArrayBuffer>, fileName: string, mimeType: string) {
-    const blob = new Blob([data], { type: mimeType });
+  /**
+   * Triggers a browser download for the final converted Blob.
+   */
+  private handleDownload(blob: Blob, fileName: string) {
     const url = window.URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
@@ -115,12 +143,6 @@ export class ConversionService {
     anchor.click();
     document.body.removeChild(anchor);
     window.URL.revokeObjectURL(url);
-  }
-
-  public resetState() {
-    this.error.set(null);
-    this.status.set('Idle');
-    this.progress.set(0);
   }
 
 }

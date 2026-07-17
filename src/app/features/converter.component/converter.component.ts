@@ -3,13 +3,15 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Title, Meta } from '@angular/platform-browser';
 import { ConversionService } from '../../core/services/conversion.service';
 import { isConversionSupported, acceptFor } from '../../core/constants/supported-formats';
+import { DropZone } from '../../shared/components/drop-zone/drop-zone';
+import { ProgressBar } from '../../shared/components/progress-bar/progress-bar';
 
-const MAX_FILE_SIZE_BYTES = 500 * 1024 * 1024; // 500MB limit for general browser stability
+const MAX_FILE_SIZE_BYTES = 500 * 1024 * 1024; // 500MB limit
 
 @Component({
   selector: 'app-converter',
   standalone: true,
-  imports: [],
+  imports: [DropZone, ProgressBar],
   templateUrl: './converter.component.html',
   styleUrl: './converter.component.css',
 })
@@ -29,7 +31,6 @@ export class ConverterComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
-      // 1. Extract the single 'conversion' parameter (e.g., 'jpg-to-png')
       const conversionParam = params.get('conversion');
 
       if (conversionParam && conversionParam.includes('-to-')) {
@@ -37,24 +38,19 @@ export class ConverterComponent implements OnInit, OnDestroy {
         this.formatFrom = from.toUpperCase();
         this.formatTo = to.toUpperCase();
       } else {
-        // Fallback for malformed URLs
         this.formatFrom = 'UNKNOWN';
         this.formatTo = 'UNKNOWN';
       }
 
       this.isSupported = isConversionSupported(this.formatFrom, this.formatTo);
       this.acceptAttr = acceptFor(this.formatFrom);
-
-      // Clear any leftover state from a previous route
       this.localError = null;
       this.conversionService.resetState();
-
       this.updateSeoTags();
     });
   }
 
   ngOnDestroy(): void {
-    // Prevent orphaned background workers if the user navigates away
     if (this.conversionService.isProcessing()) {
       this.conversionService.cancel();
     }
@@ -75,16 +71,8 @@ export class ConverterComponent implements OnInit, OnDestroy {
     this.metaService.updateTag({ property: 'og:description', content: pageDescription });
   }
 
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-
-    input.value = '';
-
-    if (!file) {
-      return;
-    }
-
+  // UPDATED: Now receives a File directly from our DropZone component
+  onFileSelected(file: File) {
     this.localError = null;
 
     if (!this.isSupported) {

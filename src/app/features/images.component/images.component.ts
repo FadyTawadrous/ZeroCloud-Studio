@@ -32,7 +32,7 @@ export class ImagesComponent implements OnDestroy {
 
   // Pipeline Options
   options: ImageConversionOptions = {
-    format: 'webp',
+    format: 'WEBP',
     quality: 80,
     filter: 'none'
   };
