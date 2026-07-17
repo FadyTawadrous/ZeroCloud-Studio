@@ -1,0 +1,93 @@
+/* Icon badge — same pattern as the home page cards */
+.icon-badge {
+    width: 48px;
+    height: 48px;
+    border-radius: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.icon-badge-primary {
+    background-color: rgba(var(--bs-primary-rgb), 0.12);
+    color: var(--bs-primary);
+}
+
+/* Drag-and-drop upload zone */
+.upload-zone {
+    border: 2px dashed var(--bs-border-color);
+    border-radius: 1rem;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+    margin-bottom: 1.5rem;
+}
+
+.upload-zone:hover,
+.upload-zone:focus-visible {
+    border-color: var(--accent-color);
+    background-color: var(--hover-bg);
+}
+
+.upload-zone--active {
+    border-color: var(--accent-color);
+    background-color: var(--active-bg);
+}
+
+.upload-zone:focus-visible {
+    outline: none;
+}
+
+/* Selected file preview row */
+.file-preview-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.85rem;
+    border: 1px solid var(--bs-border-color);
+    background-color: var(--hover-bg);
+}
+
+.file-preview-thumb {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 0.6rem;
+    flex-shrink: 0;
+    background-color: var(--bs-border-color);
+}
+
+.min-w-0 {
+    min-width: 0;
+}
+
+/* Result / before-after card */
+.result-card {
+    padding: 1rem 1.25rem;
+    border-radius: 0.85rem;
+    border: 1px solid var(--bs-border-color);
+    background-color: var(--hover-bg);
+}
+
+/* Inline notice banners, matching the pattern used elsewhere in the app */
+.notice {
+    padding: 0.75rem 1rem;
+    border-radius: 0.6rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.notice--error {
+    background-color: rgba(var(--bs-danger-rgb), 0.12);
+    color: var(--bs-danger);
+    border: 1px solid rgba(var(--bs-danger-rgb), 0.25);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .upload-zone {
+        transition: none;
+    }
+}

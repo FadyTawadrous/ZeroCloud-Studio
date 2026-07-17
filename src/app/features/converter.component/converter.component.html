@@ -1,34 +1,67 @@
-<div class="converter-container">
-    <h2>Local {{ formatFrom }} to {{ formatTo }} Converter</h2>
-    <p>Your files never leave your device.</p>
+<div class="container max-w-custom mx-auto py-5 text-center">
+    <h2 class="display-5 fw-bold mb-3">
+        Local <span class="animated-gradient-text">{{ formatFrom }} to {{ formatTo }}</span>
+    </h2>
+    <p class="lead text-muted mb-5">Your files never leave your device. 100% private and secure.</p>
 
     @if (!isSupported) {
-    <div class="notice notice--warning" role="alert">
-        Converting {{ formatFrom }} to {{ formatTo }} isn't supported yet.
+    <div class="alert alert-warning shadow-sm border-warning rounded-4" role="alert">
+        Converting <strong>{{ formatFrom }}</strong> to <strong>{{ formatTo }}</strong> isn't supported yet.
     </div>
     } @else {
-    <label class="file-input-label" for="file-input">Choose a {{ formatFrom }} file</label>
-    <input id="file-input" type="file" [accept]="acceptAttr" (change)="onFileSelected($event)"
-        [disabled]="conversionService.isProcessing()" />
+    <!-- Modern "Dropzone" Card -->
+    <div class="card modern-card p-2 mb-4 border-dashed dropzone-card">
+        <!-- Visually hidden but accessible file input -->
+        <input id="file-input" type="file" class="visually-hidden" [accept]="acceptAttr"
+            (change)="onFileSelected($event)" [disabled]="conversionService.isProcessing()" />
+
+        <!-- The label acts as the giant clickable area -->
+        <label class="dropzone-label d-flex flex-column align-items-center justify-content-center p-5 m-0"
+            for="file-input" [class.disabled]="conversionService.isProcessing()">
+            <div class="icon-box icon-box-primary mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+                    <path
+                        d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                    <path
+                        d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z" />
+                </svg>
+            </div>
+            <h4 class="fw-bold mb-2">Click to select a {{ formatFrom }} file</h4>
+            <p class="text-muted small mb-0">Max file size: 500MB</p>
+        </label>
+    </div>
     }
 
     @if (localError) {
-    <div class="notice notice--error" role="alert">
+    <div class="alert alert-danger shadow-sm rounded-4" role="alert">
         {{ localError }}
     </div>
     }
 
     @if (conversionService.error()) {
-    <div class="notice notice--error" role="alert">
+    <div class="alert alert-danger shadow-sm rounded-4" role="alert">
         {{ conversionService.error() }}
     </div>
     }
 
     @if (conversionService.isProcessing()) {
-    <div class="progress-block" aria-live="polite">
-        <p><strong>Status:</strong> {{ conversionService.status() }}</p>
-        <p>Processing locally... {{ conversionService.progress() }}%</p>
-        <button type="button" (click)="onCancel()">Cancel</button>
+    <div class="card modern-card p-4 text-start shadow-sm mt-4" aria-live="polite">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="fw-bold text-primary">{{ conversionService.status() }}</span>
+            <span class="text-muted small fw-bold">{{ conversionService.progress() }}%</span>
+        </div>
+
+        <!-- Bootstrap Animated Progress Bar -->
+        <div class="progress mb-4 bg-body-secondary rounded-pill" style="height: 12px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated rounded-pill" role="progressbar"
+                [style.width]="conversionService.progress() + '%'"></div>
+        </div>
+
+        <div class="text-end">
+            <button class="btn btn-outline-danger btn-sm rounded-pill px-4 fw-medium" (click)="onCancel()">
+                Cancel Processing
+            </button>
+        </div>
     </div>
     }
 </div>

@@ -1,0 +1,41 @@
+.modern-card {
+    background-color: var(--nav-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+/* Ensure the status text doesn't push the percentage off-screen if it gets too long */
+.status-text {
+    max-width: 85%;
+    display: inline-block;
+}
+
+/* The gradient progress bar fill */
+.custom-gradient-bar {
+    background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
+    background-size: 200% 100%;
+    animation: gradientMove 2s linear infinite;
+    /* This transition makes the bar slide smoothly when the number changes */
+    transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+@keyframes gradientMove {
+    0% {
+        background-position: 100% 0;
+    }
+
+    100% {
+        background-position: -100% 0;
+    }
+}
+
+/* Subtle hover effect for the cancel button */
+.cancel-btn {
+    transition: all 0.2s ease;
+}
+
+.cancel-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.2);
+}

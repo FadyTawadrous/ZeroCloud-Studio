@@ -2,6 +2,16 @@
 // Legacy formats (WMA, WMV, FLV, AVI) are intentionally excluded for V1 
 // to maintain a lightweight, high-performance architecture.
 
+// --- STRICT TYPES FOR INTERFACES ---
+export type SupportedVideoFormat = 'MP4' | 'WEBM' | 'MOV' | 'MKV' | 'AV1';
+export type SupportedAudioFormat = 'MP3' | 'WAV' | 'OGG' | 'FLAC' | 'AAC' | 'OPUS';
+export type SupportedImageFormat = 'PNG' | 'JPG' | 'JPEG' | 'WEBP' | 'AVIF' | 'ICO' | 'BMP' | 'TGA' | 'TIFF' | 'TIF';
+
+// Extract subsets for output interfaces (since some formats are input-only)
+export type ImageOutputFormat = 'PNG' | 'JPG' | 'JPEG' | 'WEBP' | 'AVIF' | 'ICO';
+export type AudioOutputFormat = 'MP3' | 'WAV' | 'OGG' | 'FLAC' | 'AAC' | 'OPUS';
+export type VideoOutputFormat = 'MP4' | 'WEBM' | 'MOV';
+
 export const SUPPORTED_CONVERSIONS: Record<string, string[]> = {
   // --- VIDEO (Powered by Mediabunny) ---
   MP4: ['WEBM', 'MOV', 'MP3', 'WAV'], // Video to Video / Video to Audio

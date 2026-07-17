@@ -1,1 +1,48 @@
-<p>format-selector works!</p>
+<div class="format-selector-wrapper text-start">
+    @if (label) {
+    <label [for]="'format-select-' + label"
+        class="form-label fw-bold text-muted small ms-1 mb-2 tracking-wide text-uppercase">
+        {{ label }}
+    </label>
+    }
+
+    <div class="position-relative">
+        <select [id]="'format-select-' + label" class="form-select form-select-lg modern-select fw-medium shadow-sm"
+            [value]="selectedFormat" (change)="onFormatChange($event)" [disabled]="disabled"
+            [class.disabled-select]="disabled">
+
+            <!-- Default placeholder if nothing is selected yet -->
+            @if (!selectedFormat) {
+            <option value="" disabled selected>Select a format...</option>
+            }
+
+            <!-- Loop through the grouped options -->
+            @for (group of groupedOptions; track group.groupName) {
+            <!-- Only use optgroup if there's actually a group name defined -->
+            @if (group.groupName !== 'Other') {
+            <optgroup [label]="group.groupName">
+                @for (opt of group.items; track opt.id) {
+                <option [value]="opt.id">
+                    {{ opt.icon ? opt.icon + ' ' : '' }}{{ opt.label }}
+                </option>
+                }
+            </optgroup>
+            } @else {
+            @for (opt of group.items; track opt.id) {
+            <option [value]="opt.id">
+                {{ opt.icon ? opt.icon + ' ' : '' }}{{ opt.label }}
+            </option>
+            }
+            }
+            }
+        </select>
+
+        <!-- Custom Dropdown Chevron for styling -->
+        <div class="custom-chevron position-absolute top-50 end-0 translate-middle-y pe-3 pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                <path fill-rule="evenodd"
+                    d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+            </svg>
+        </div>
+    </div>
+</div>

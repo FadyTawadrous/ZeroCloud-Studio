@@ -1,0 +1,61 @@
+.tracking-wide {
+    letter-spacing: 1px;
+}
+
+.modern-select {
+    background-color: var(--nav-bg);
+    color: var(--bs-body-color);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 1rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    padding-left: 1.25rem;
+    padding-right: 2.5rem;
+    /* Make room for custom chevron */
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    /* Remove default browser styling */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: none !important;
+    /* Hide bootstrap's default arrow */
+}
+
+/* The Glowing Focus Ring */
+.modern-select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.15);
+    outline: 0;
+}
+
+/* Hover State */
+.modern-select:not(:disabled):hover {
+    border-color: rgba(var(--bs-primary-rgb), 0.5);
+    background-color: rgba(var(--bs-primary-rgb), 0.02);
+}
+
+/* Disabled State */
+.disabled-select {
+    background-color: var(--bs-secondary-bg) !important;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Custom Chevron Styling */
+.custom-chevron {
+    color: var(--bs-secondary-color);
+    transition: transform 0.2s ease;
+}
+
+.modern-select:focus+.custom-chevron {
+    color: var(--accent-color);
+    transform: translateY(-50%) rotate(180deg);
+    /* Flip arrow up when open */
+}
+
+.pointer-events-none {
+    pointer-events: none;
+    /* Ensure clicking the arrow opens the select underneath */
+}
