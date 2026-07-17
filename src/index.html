@@ -1,12 +1,28 @@
 <!doctype html>
-<html lang="en" data-bs-theme="light">
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
   <title>LocalConverter</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)">
+  <meta name="description"
+    content="LocalConverter is a free and open-source file converter that runs entirely in your browser. It allows you to convert images, audio, videos, and PDF files to different formats without uploading them to a server, ensuring your privacy.">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <script>
+    (function () {
+      try {
+        const saved = localStorage.getItem('theme');
+        const theme = saved || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-bs-theme', theme);
+      } catch {
+        document.documentElement.setAttribute('data-bs-theme', 'light');
+      }
+    })();
+  </script>
 </head>
 
 <body>

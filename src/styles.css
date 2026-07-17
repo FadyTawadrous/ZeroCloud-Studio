@@ -5,6 +5,7 @@ body {
     margin: 0;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
     background-color: var(--bg-color);
+    scroll-behavior: smooth; /* Added for smooth anchor scrolling */
 }
 
 /* Fix for the floating footer: make Angular's root manage the flex layout */
@@ -12,13 +13,15 @@ app-root {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    background-color: var(--bg-color);
     transition: background-color 0.4s ease, color 0.4s ease;
 }
 
 /* Light Mode Modern Tokens */
 [data-bs-theme="light"] {
-    --bg-color: #f8fafc;
+    --bs-body-bg: #f8fafc;
     --bs-body-color: #212529;
+    --bg-color: #f8fafc;
     --nav-bg: rgba(255, 255, 255, 0.85);
     --bs-border-color: #e2e8f0;
     --accent-color: #4f46e5;
@@ -26,6 +29,10 @@ app-root {
     --active-bg: rgba(79, 70, 229, 0.22);
     --footer-bg: #ffffff;
     --footer-border: #e2e8f0;
+
+    /* Bootstrap overrides for light mode */
+    --bs-primary: var(--accent-color);
+    --bs-primary-rgb: 79, 70, 229;
 }
 
 /* Dark Mode Modern Tokens */
@@ -38,6 +45,16 @@ app-root {
     --accent-color: #c084fc;
     --hover-bg: rgba(192, 132, 252, 0.15);
     --active-bg: rgba(192, 132, 252, 0.25);
-    --footer-bg: #020617; 
+    --footer-bg: #020617;
     --footer-border: #1e293b;
+
+    /* Bootstrap overrides for dark mode */
+    --bs-primary: var(--accent-color);
+    --bs-primary-rgb: 192, 132, 252;
+}
+
+/* Ensure primary buttons are readable in dark mode */
+[data-bs-theme="dark"] .btn-primary {
+    --bs-btn-color: #0f172a;
+    --bs-btn-hover-color: #020617;
 }

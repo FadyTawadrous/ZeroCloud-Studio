@@ -9,7 +9,7 @@ export class MediabunnyService implements IVideoConverter {
   async convertAsync(file: File, options: VideoConversionOptions): Promise<Blob> {
     return new Promise((resolve, reject) => {
       // Spawn the dedicated video worker
-      const worker = new Worker(new URL('./mediabunny.worker.ts', import.meta.url), { type: 'module' });
+      const worker = new Worker(new URL('../../../features/video.component/mediabunny.worker.ts', import.meta.url), { type: 'module' });
 
       worker.onmessage = (event) => {
         const { success, blob, error } = event.data;

@@ -33,7 +33,7 @@
     "@angular/ssr": "^20.3.3",
     "@mediabunny/flac-encoder": "^1.50.8",
     "@mediabunny/mp3-encoder": "^1.50.8",
-    "@ng-bootstrap/ng-bootstrap": "^21.0.0",
+    "@ng-bootstrap/ng-bootstrap": "^19.0.1",
     "@popperjs/core": "^2.11.8",
     "@silvia-odwyer/photon": "^0.3.3",
     "bootstrap": "^5.3.8",

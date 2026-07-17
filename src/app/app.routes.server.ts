@@ -9,9 +9,8 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'video', renderMode: RenderMode.Prerender },
   { path: 'pdf', renderMode: RenderMode.Prerender },
 
-  // Prerender the dynamic SEO conversion paths
   {
-    path: ':from-to-:to',
+    path: ':conversion', // Match the updated route
     renderMode: RenderMode.Prerender,
     getPrerenderParams: async () => {
       const params = [];
@@ -19,7 +18,8 @@ export const serverRoutes: ServerRoute[] = [
       for (const [from, toList] of Object.entries(SUPPORTED_CONVERSIONS)) {
         for (const to of toList) {
           params.push({
-            'from-to-:to': `${from.toLowerCase()}-to-${to.toLowerCase()}`
+            // Output the exact parameter name and the generated string
+            conversion: `${from.toLowerCase()}-to-${to.toLowerCase()}`
           });
         }
       }
@@ -28,7 +28,6 @@ export const serverRoutes: ServerRoute[] = [
     }
   },
 
-  // Handle anything else via standard SSR
   {
     path: '**',
     renderMode: RenderMode.Server

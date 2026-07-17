@@ -2,10 +2,6 @@
     max-width: 800px;
 }
 
-.cursor-pointer {
-    cursor: pointer;
-}
-
 .modern-card {
     background-color: var(--nav-bg);
     border: 1px solid var(--bs-border-color);

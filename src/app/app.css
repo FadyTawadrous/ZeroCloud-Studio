@@ -2,8 +2,11 @@
 .navbar-glass {
     background-color: var(--nav-bg) !important;
     backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px); /* For Safari support */
     border-bottom: 1px solid var(--bs-border-color);
+    position: sticky;
+    top: 0;
+    z-index: 1030;
 }
 
 /* 2. Gradient Brand Text */
