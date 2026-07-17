@@ -1,18 +1,35 @@
-// Central place to declare which conversions your ffmpeg core build actually
-// supports. Extend this as you add more formats/tools (audio, image, pdf...).
+// Core conversion matrix for Version 1 (Pure WebCodecs + WebAssembly)
+// Legacy formats (WMA, WMV, FLV, AVI) are intentionally excluded for V1 
+// to maintain a lightweight, high-performance architecture.
+
 export const SUPPORTED_CONVERSIONS: Record<string, string[]> = {
-  MP4: ['MP3', 'WEBM', 'MOV', 'GIF'],
-  MOV: ['MP4', 'WEBM', 'MP3'],
-  WEBM: ['MP4', 'MP3'],
-  MKV: ['MP4', 'MP3'],
-  MP3: ['WAV', 'OGG', 'AAC', 'FLAC'],
-  WAV: ['MP3', 'OGG', 'AAC', 'FLAC'],
-  OGG: ['MP3', 'WAV'],
-  FLAC: ['MP3', 'WAV'],
-  PNG: ['JPG', 'WEBP', 'GIF'],
-  JPG: ['PNG', 'WEBP'],
-  JPEG: ['PNG', 'WEBP'],
-  WEBP: ['PNG', 'JPG'],
+  // --- VIDEO (Powered by Mediabunny) ---
+  MP4: ['WEBM', 'MOV', 'MP3', 'WAV'], // Video to Video / Video to Audio
+  WEBM: ['MP4', 'MOV', 'MP3', 'WAV'],
+  MOV: ['MP4', 'WEBM', 'MP3', 'WAV'],
+  MKV: ['MP4', 'WEBM', 'MOV', 'MP3', 'WAV'], // MKV is heavy, often input-only, but transcodable
+
+  // --- AUDIO (Powered by Mediabunny) ---
+  MP3: ['WAV', 'OGG', 'FLAC', 'AAC', 'OPUS'],
+  WAV: ['MP3', 'OGG', 'FLAC', 'AAC', 'OPUS'],
+  OGG: ['MP3', 'WAV', 'FLAC', 'AAC', 'OPUS'],
+  FLAC: ['MP3', 'WAV', 'OGG', 'AAC', 'OPUS'],
+  AAC: ['MP3', 'WAV', 'OGG', 'FLAC', 'OPUS'],
+  OPUS: ['MP3', 'WAV', 'OGG', 'FLAC', 'AAC'],
+
+  // --- IMAGES (Powered by Photon + OffscreenCanvas) ---
+  PNG: ['JPG', 'WEBP', 'AVIF', 'ICO'],
+  JPG: ['PNG', 'WEBP', 'AVIF', 'ICO'],
+  JPEG: ['PNG', 'WEBP', 'AVIF', 'ICO'],
+  WEBP: ['PNG', 'JPG', 'AVIF', 'ICO'],
+  AVIF: ['PNG', 'JPG', 'WEBP', 'ICO'],
+  ICO: ['PNG', 'JPG', 'WEBP', 'AVIF'],
+
+  // Input-only image formats (uncompressed/legacy)
+  BMP:  ['PNG', 'JPG', 'WEBP', 'AVIF', 'ICO'],
+  TGA:  ['PNG', 'JPG', 'WEBP', 'AVIF', 'ICO'],
+  TIFF: ['PNG', 'JPG', 'WEBP', 'AVIF', 'ICO'],
+  TIF:  ['PNG', 'JPG', 'WEBP', 'AVIF', 'ICO'],
 };
 
 export function isConversionSupported(from: string, to: string): boolean {
@@ -20,21 +37,34 @@ export function isConversionSupported(from: string, to: string): boolean {
   return !!targets && targets.includes(to.toUpperCase());
 }
 
-// Maps a format to a reasonable <input accept> value so the file picker
-// only shows relevant files. Extend alongside SUPPORTED_CONVERSIONS.
+// Maps a format to a strict <input accept> value so the browser's 
+// native file picker only shows files our pipeline can actually process.
 const ACCEPT_MAP: Record<string, string> = {
+  // Video
   MP4: 'video/mp4',
   MOV: 'video/quicktime',
   WEBM: 'video/webm',
   MKV: 'video/x-matroska',
+
+  // Audio
   MP3: 'audio/mpeg',
   WAV: 'audio/wav',
   OGG: 'audio/ogg',
   FLAC: 'audio/flac',
+  AAC: 'audio/aac',
+  OPUS: 'audio/opus',
+
+  // Images
   PNG: 'image/png',
   JPG: 'image/jpeg',
   JPEG: 'image/jpeg',
   WEBP: 'image/webp',
+  AVIF: 'image/avif',
+  ICO: 'image/x-icon',
+  BMP:  'image/bmp',
+  TGA:  'image/x-tga',
+  TIFF: 'image/tiff',
+  TIF:  'image/tiff',
 };
 
 export function acceptFor(format: string): string {

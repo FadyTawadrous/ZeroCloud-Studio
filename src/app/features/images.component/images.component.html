@@ -1,1 +1,110 @@
-<p>images.component works!</p>
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card modern-card p-4 shadow-sm border-0" style="background-color: var(--nav-bg);">
+            <div class="card-body">
+
+                <h2 class="fw-bold text-gradient mb-4">🖼️ Image Studio</h2>
+
+                <!-- 1. File Upload -->
+                <div class="mb-4">
+                    <label class="form-label fw-medium">1. Select an Image</label>
+                    <input type="file" class="form-control form-control-lg" accept="image/png, image/jpeg, image/webp"
+                        (change)="onFileSelected($event)">
+                </div>
+
+                @if (selectedFile) {
+                <!-- 2. Core Settings -->
+                <div class="row g-3 mb-4 p-3 rounded" style="background-color: var(--hover-bg);">
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium small">Target Format</label>
+                        <select class="form-select" [(ngModel)]="options.format">
+                            <option value="png">PNG (Lossless)</option>
+                            <option value="jpeg">JPEG (Compressed)</option>
+                            <option value="webp">WebP (Modern)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium small">Quality: {{ options.quality }}%</label>
+                        <input type="range" class="form-range" min="10" max="100" [(ngModel)]="options.quality"
+                            [disabled]="options.format === 'png'">
+                    </div>
+                </div>
+
+                <!-- 3. Advanced Tools -->
+                <div class="mb-4 p-3 rounded border" style="border-color: var(--bs-border-color) !important;">
+                    <h6 class="fw-bold mb-3 text-muted">Advanced Tools (Optional)</h6>
+
+                    <!-- Resize & Aspect Ratio -->
+                    <div class="row align-items-end mb-3">
+                        <div class="col-sm-5">
+                            <label class="form-label small">Width (px)</label>
+                            <input type="number" class="form-control" [(ngModel)]="resizeWidth"
+                                (ngModelChange)="onWidthChanged()">
+                        </div>
+
+                        <div class="col-sm-2 text-center pb-1">
+                            <button class="btn btn-sm" [class.btn-primary]="lockRatio"
+                                [class.btn-outline-secondary]="!lockRatio" (click)="toggleRatioLock()"
+                                title="Lock Aspect Ratio">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    viewBox="0 0 16 16">
+                                    <path
+                                        d="M4.5 9a3.5 3.5 0 1 0 0 7h7a3.5 3.5 0 1 0 0-7h-7Zm7 6a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Zm-7 0a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5Z" />
+                                    <path
+                                        d="M5.273 11.026a.5.5 0 0 1 .714-.148l3.05 2.2a.5.5 0 1 1-.586.812l-3.05-2.2a.5.5 0 0 1-.128-.664Z" />
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="col-sm-5">
+                            <label class="form-label small">Height (px)</label>
+                            <input type="number" class="form-control" [(ngModel)]="resizeHeight"
+                                (ngModelChange)="onHeightChanged()">
+                        </div>
+                    </div>
+
+                    <!-- Filters & Watermark -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small">Apply Filter</label>
+                            <select class="form-select" [(ngModel)]="options.filter">
+                                <option value="none">None</option>
+                                <option value="grayscale">Grayscale</option>
+                                <option value="sepia">Sepia</option>
+                                <option value="vintage">Vintage</option>
+                                <option value="invert">Invert Colors</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small">Watermark Text</label>
+                            <input type="text" class="form-control" placeholder="e.g., Copyright 2026"
+                                [(ngModel)]="options.watermark">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm"
+                    style="background-color: var(--accent-color); border: none;" (click)="convertImage()"
+                    [disabled]="isProcessing">
+                    @if (isProcessing) {
+                    <span class="spinner-border spinner-border-sm me-2"></span> Processing locally...
+                    } @else {
+                    Execute Pipeline
+                    }
+                </button>
+                }
+
+                <!-- Download Result -->
+                @if (downloadUrl) {
+                <div class="mt-4 text-center">
+                    <a [href]="downloadUrl" [download]="outputFilename" class="btn btn-success fw-medium px-4 py-2">
+                        💾 Download Output
+                    </a>
+                </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
