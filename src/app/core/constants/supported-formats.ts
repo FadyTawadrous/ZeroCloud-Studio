@@ -8,6 +8,7 @@ export const SUPPORTED_CONVERSIONS: Record<string, string[]> = {
   WEBM: ['MP4', 'MOV', 'MP3', 'WAV'],
   MOV: ['MP4', 'WEBM', 'MP3', 'WAV'],
   MKV: ['MP4', 'WEBM', 'MOV', 'MP3', 'WAV'], // MKV is heavy, often input-only, but transcodable
+  AV1:  ['MP4', 'WEBM', 'MOV', 'MP3', 'WAV'],
 
   // --- AUDIO (Powered by Mediabunny) ---
   MP3: ['WAV', 'OGG', 'FLAC', 'AAC', 'OPUS'],
@@ -45,7 +46,8 @@ const ACCEPT_MAP: Record<string, string> = {
   MOV: 'video/quicktime',
   WEBM: 'video/webm',
   MKV: 'video/x-matroska',
-
+  AV1: 'video/av1',
+  
   // Audio
   MP3: 'audio/mpeg',
   WAV: 'audio/wav',
