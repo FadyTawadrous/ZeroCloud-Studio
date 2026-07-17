@@ -24,28 +24,21 @@
                 "input": "public"
               },
               {
-                "glob": "**/*",
-                "input": "node_modules/@ffmpeg/core/dist/esm",
-                "output": "/ffmpeg-core"
-              },
-              {
-                "glob": "**/*",
-                "input": "node_modules/@ffmpeg/ffmpeg/dist/esm",
-                "output": "/ffmpeg-wrapper"
-              },
-              {
                 "glob": "photon_rs_bg.wasm",
                 "input": "node_modules/@silvia-odwyer/photon",
-                "output": "/"
+                "output": "/photon/"
+              },
+              {
+                "glob": "pdf.worker.min.mjs",
+                "input": "node_modules/pdfjs-dist/build",
+                "output": "/pdfjs/"
               }
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
               "src/styles.css"
             ],
-            "scripts": [
-              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
-            ],
+            "scripts": [],
             "server": "src/main.server.ts",
             "outputMode": "server",
             "ssr": {
@@ -83,18 +76,6 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
-          "options": {
-            "prebundle": {
-              "exclude": [
-                "@ffmpeg/ffmpeg",
-                "@ffmpeg/util"
-              ]
-            },
-            "headers": {
-              "Cross-Origin-Opener-Policy": "same-origin",
-              "Cross-Origin-Embedder-Policy": "require-corp"
-            }
-          },
           "configurations": {
             "production": {
               "buildTarget": "local-converter:build:production"
