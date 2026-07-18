@@ -41,7 +41,7 @@ export class ImagesComponent implements OnDestroy {
 
   // Pipeline Options mapped to our strict interface
   options: ImageConversionOptions = {
-    format: 'WEBP',
+    format: 'JPG',
     quality: 80,
     filter: 'none'
   };
@@ -68,11 +68,13 @@ export class ImagesComponent implements OnDestroy {
 
   // Preset Resize Options for common social media and web use cases
   presets: ResizePreset[] = [
-    { name: 'Instagram Square (1080x1080)', format: 'JPEG', width: 1080, height: 1080 },
-    { name: 'Facebook Cover (820x312)', format: 'JPEG', width: 820, height: 312 },
-    { name: 'YouTube Thumbnail (1280x720)', format: 'JPEG', width: 1280, height: 720 },
-    { name: 'Profile Picture (400x400)', format: 'JPEG', width: 400, height: 400 },
+    { name: 'Instagram Square (1080x1080)', format: 'JPG', width: 1080, height: 1080 },
+    { name: 'Facebook Cover (820x312)', format: 'JPG', width: 820, height: 312 },
+    { name: 'YouTube Thumbnail (1280x720)', format: 'JPG', width: 1280, height: 720 },
+    { name: 'Profile Picture (400x400)', format: 'JPG', width: 400, height: 400 },
   ];
+
+  activePreset = '';
 
   ngOnDestroy(): void {
     this.revokePreviewUrl();
@@ -138,12 +140,14 @@ export class ImagesComponent implements OnDestroy {
   }
 
   onWidthChanged() {
+    this.activePreset = ''; // Clear preset selection on manual edit
     if (this.lockRatio && this.resizeWidth) {
       this.resizeHeight = Math.round(this.resizeWidth / this.originalAspectRatio);
     }
   }
 
   onHeightChanged() {
+    this.activePreset = ''; // Clear preset selection on manual edit
     if (this.lockRatio && this.resizeHeight) {
       this.resizeWidth = Math.round(this.resizeHeight * this.originalAspectRatio);
     }

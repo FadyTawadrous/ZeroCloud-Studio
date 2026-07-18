@@ -48,9 +48,8 @@ export class FormatSelector {
     return Array.from(map.entries()).map(([groupName, items]) => ({ groupName, items }));
   }
 
-  onFormatChange(event: Event) {
-    const selectElement = event.target as HTMLSelectElement;
-    this.selectedFormat = selectElement.value;
-    this.selectionChange.emit(this.selectedFormat);
+  onModelChange(newValue: string) {
+    this.selectionChange.emit(newValue);
   }
+
 }

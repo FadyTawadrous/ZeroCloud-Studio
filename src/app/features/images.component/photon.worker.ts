@@ -51,7 +51,7 @@ addEventListener('message', async (event: MessageEvent) => {
     }
 
     // 4. Pipeline Step: Crop
-    if (options.crop) {
+    if (options.crop && options.crop.width > 0 && options.crop.height > 0) {
       const cropped = photon.crop(img, options.crop.x, options.crop.y, options.crop.width, options.crop.height);
       img.free();
       img = cropped;

@@ -45,7 +45,8 @@
                     (selectionChange)="onFormatChange($event)">
                 </app-format-selector>
 
-                <label class="form-label fw-bold text-muted small mt-4 mb-2 tracking-wide text-uppercase">
+                <label class="form-label fw-bold text-muted small mt-4 mb-2 tracking-wide text-uppercase"
+                    [class.opacity-50]="options.format === 'PNG'">
                     Quality: {{ options.quality }}%
                 </label>
                 <input type="range" class="form-range custom-range" min="10" max="100" [(ngModel)]="options.quality"
@@ -55,7 +56,7 @@
                 <div class="mb-4">
                     <label class="form-label fw-bold text-muted small mt-4 mb-2 tracking-wide text-uppercase">Use
                         Preset</label>
-                    <select class="form-select modern-select" (change)="applyPreset($event)">
+                    <select class="form-select modern-select" [(ngModel)]="activePreset" (change)="applyPreset($event)">
                         <option value="">Custom Size</option>
                         @for (p of presets; track p.name) {
                         <option [value]="p.name">{{ p.name }}</option>

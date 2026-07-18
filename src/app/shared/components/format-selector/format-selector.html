@@ -8,7 +8,7 @@
 
     <div class="position-relative">
         <select [id]="'format-select-' + label" class="form-select form-select-lg modern-select fw-medium shadow-sm"
-            [value]="selectedFormat" (change)="onFormatChange($event)" [disabled]="disabled"
+            [ngModel]="selectedFormat" (ngModelChange)="onModelChange($event)" [disabled]="disabled"
             [class.disabled-select]="disabled">
 
             <!-- Default placeholder if nothing is selected yet -->
