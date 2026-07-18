@@ -130,19 +130,50 @@
                     </div>
                 </div>
 
+                <!-- Visual Crop Section -->
                 <div class="mb-3">
-                    <label class="form-label small fw-medium">Crop (X, Y, W, H)</label>
-                    <div class="row g-2">
-                        <div class="col-3"><input type="number" class="form-control modern-input" [(ngModel)]="crop.x"
-                                placeholder="X"></div>
-                        <div class="col-3"><input type="number" class="form-control modern-input" [(ngModel)]="crop.y"
-                                placeholder="Y"></div>
-                        <div class="col-3"><input type="number" class="form-control modern-input"
-                                [(ngModel)]="crop.width" placeholder="W"></div>
-                        <div class="col-3"><input type="number" class="form-control modern-input"
-                                [(ngModel)]="crop.height" placeholder="H"></div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <label class="form-label small fw-medium mb-0">Crop Image</label>
+                        @if (hasActiveCrop) {
+                        <span class="badge bg-primary rounded-pill small">Active</span>
+                        }
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button
+                            class="btn modern-input flex-grow-1 text-start fw-medium d-flex justify-content-between align-items-center"
+                            (click)="openCropper()">
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                    class="me-2 mb-1" viewBox="0 0 16 16">
+                                    <path d="M10.5 9a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
+                                    <path
+                                        d="M3 2.5a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-11zm1 .5v10h8V3H4z" />
+                                </svg>
+                                Launch Visual Cropper
+                            </span>
+                            <span class="text-muted small">&rarr;</span>
+                        </button>
+
+                        @if (hasActiveCrop) {
+                        <button class="btn btn-outline-danger modern-input px-3" (click)="clearCrop()"
+                            title="Clear Crop">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                viewBox="0 0 16 16">
+                                <path
+                                    d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+                            </svg>
+                        </button>
+                        }
                     </div>
                 </div>
+
+                <!-- Add the Modal Component at the very bottom of the file (before the closing </div> of the container) -->
+                @if (showCropperModal && previewUrl) {
+                <app-image-cropper [imageUrl]="previewUrl" (cropApplied)="onCropApplied($event)"
+                    (modalClosed)="closeCropper()">
+                </app-image-cropper>
+                }
 
             </div>
         </div>

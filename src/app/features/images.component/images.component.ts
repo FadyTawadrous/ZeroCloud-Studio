@@ -6,8 +6,8 @@ import { ImageConversionOptions } from '../../core/interfaces/iimage-converter';
 import { ImageOutputFormat } from '../../core/constants/supported-formats';
 import { DropZone } from '../../shared/components/drop-zone/drop-zone';
 import { FormatSelector, FormatOption } from '../../shared/components/format-selector/format-selector';
-// Make sure this path matches where you saved your pipe
 import { FileSizePipe } from '../../shared/pipes/file-size-pipe';
+import { CropData, ImageCropper } from '../../shared/components/image-cropper/image-cropper';
 
 const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
 
@@ -21,7 +21,7 @@ interface ResizePreset {
 @Component({
   selector: 'app-images',
   standalone: true,
-  imports: [CommonModule, FormsModule, DropZone, FormatSelector, FileSizePipe],
+  imports: [CommonModule, FormsModule, DropZone, FormatSelector, FileSizePipe, ImageCropper],
   templateUrl: './images.component.html',
   styleUrl: './images.component.css',
 })
@@ -61,7 +61,9 @@ export class ImagesComponent implements OnDestroy {
   originalAspectRatio = 1;
   lockRatio = true;
 
-  crop = { x: 0, y: 0, width: 0, height: 0 };
+  showCropperModal = false;
+  hasActiveCrop = false;
+  crop: CropData = { x: 0, y: 0, width: 0, height: 0 };
 
   originalWidth = 0;
   originalHeight = 0;
@@ -159,10 +161,23 @@ export class ImagesComponent implements OnDestroy {
     this.error = null;
     this.revokeDownloadUrl();
 
+    // 1. Map Resize Options
     if (this.resizeWidth && this.resizeHeight) {
       this.options.resize = { width: this.resizeWidth, height: this.resizeHeight };
     } else {
       this.options.resize = undefined;
+    }
+
+    // 2. Map Crop Options
+    if (this.crop && this.crop.width > 0 && this.crop.height > 0) {
+      this.options.crop = {
+        x: this.crop.x,
+        y: this.crop.y,
+        width: this.crop.width,
+        height: this.crop.height
+      };
+    } else {
+      this.options.crop = undefined;
     }
 
     try {
@@ -211,6 +226,26 @@ export class ImagesComponent implements OnDestroy {
   resetDimensions() {
     this.resizeWidth = this.originalWidth;
     this.resizeHeight = this.originalHeight;
+  }
+
+  // Cropper Modal Handlers
+  openCropper() {
+    this.showCropperModal = true;
+  }
+
+  closeCropper() {
+    this.showCropperModal = false;
+  }
+
+  onCropApplied(cropData: CropData) {
+    this.crop = cropData;
+    this.hasActiveCrop = true;
+    this.showCropperModal = false;
+  }
+
+  clearCrop() {
+    this.crop = { x: 0, y: 0, width: 0, height: 0 };
+    this.hasActiveCrop = false;
   }
 
 }

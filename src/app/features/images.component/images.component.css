@@ -66,6 +66,13 @@
     box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.15);
 }
 
+.modern-select:hover,
+.modern-input:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+    border-color: rgba(var(--bs-primary-rgb), 0.5);
+    color: var(--bs-body-color);
+}
+
 /* Lock Button */
 .lock-btn {
     border-radius: 50%;
@@ -118,4 +125,23 @@
 
 .btn-success:hover {
     background-color: #059669;
+}
+
+/* Styling for buttons that look like inputs (Launch Cropper) */
+button.modern-input {
+    color: var(--bs-body-color);
+    transition: all 0.3s ease;
+}
+
+button.modern-input:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+    /* Slight tint of your accent color */
+    border-color: rgba(var(--bs-primary-rgb), 0.5);
+    color: var(--bs-body-color);
+    /* Ensures text stays perfectly readable */
+}
+
+/* Optional: Slight color shift for the arrow icon on hover to make it feel alive */
+button.modern-input:hover .text-muted {
+    color: var(--accent-color) !important;
 }

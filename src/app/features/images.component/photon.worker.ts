@@ -25,17 +25,31 @@ addEventListener('message', async (event: MessageEvent) => {
     // 2. Decode the image using the initialized Photon Rust/WASM engine
     let img = photon.PhotonImage.new_from_byteslice(bytes);
 
-    // 3. Pipeline Step: Resize with Aspect Ratio support
-    if (options.resize) {
-      const origWidth = img.get_width();
-      const origHeight = img.get_height();
+    // 3. Pipeline Step: Crop (MUST HAPPEN FIRST BEFORE RESIZE)
+    if (options.crop && options.crop.width > 0 && options.crop.height > 0) {
+      if (options.crop.width > options.crop.x && options.crop.height > options.crop.y) {
+        const cropped = photon.crop(img, options.crop.x, options.crop.y, options.crop.width, options.crop.height);
+        img.free();
+        img = cropped;
+      }
+      else {
+        throw new Error("Invalid crop coordinates. The crop area is out of bounds.");
+      }
+    }
 
-      let targetWidth = options.resize.width || origWidth;
-      let targetHeight = options.resize.height || origHeight;
+
+    // 4. Pipeline Step: Resize with Aspect Ratio support
+    if (options.resize) {
+      // Get the width/height of the CURRENT image state (which might be cropped now!)
+      const currentWidth = img.get_width();
+      const currentHeight = img.get_height();
+
+      let targetWidth = options.resize.width || currentWidth;
+      let targetHeight = options.resize.height || currentHeight;
 
       // Calculate missing dimensions if the user wants proportional scaling
       if (options.resize.maintainAspectRatio) {
-        const aspect = origWidth / origHeight;
+        const aspect = currentWidth / currentHeight;
 
         if (options.resize.width && !options.resize.height) {
           targetHeight = Math.round(options.resize.width / aspect);
@@ -48,13 +62,6 @@ addEventListener('message', async (event: MessageEvent) => {
       const resized = photon.resize(img, targetWidth, targetHeight, 5);
       img.free(); // Free the old image from WASM memory
       img = resized;
-    }
-
-    // 4. Pipeline Step: Crop
-    if (options.crop && options.crop.width > 0 && options.crop.height > 0) {
-      const cropped = photon.crop(img, options.crop.x, options.crop.y, options.crop.width, options.crop.height);
-      img.free();
-      img = cropped;
     }
 
     // 5. Pipeline Step: Color Filters
