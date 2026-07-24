@@ -6,6 +6,7 @@ import { ImageConversionOptions } from '../../core/interfaces/iimage-converter';
 import { ImageOutputFormat } from '../../core/constants/supported-formats';
 import { DropZone } from '../../shared/components/drop-zone/drop-zone';
 import { FormatSelector, FormatOption } from '../../shared/components/format-selector/format-selector';
+import { ProgressBar } from '../../shared/components/progress-bar/progress-bar';
 import { FileSizePipe } from '../../shared/pipes/file-size-pipe';
 import { CropData, ImageCropper } from '../../shared/components/image-cropper/image-cropper';
 
@@ -21,7 +22,7 @@ interface ResizePreset {
 @Component({
   selector: 'app-images',
   standalone: true,
-  imports: [CommonModule, FormsModule, DropZone, FormatSelector, FileSizePipe, ImageCropper],
+  imports: [CommonModule, FormsModule, DropZone, FormatSelector, FileSizePipe, ImageCropper, ProgressBar],
   templateUrl: './images.component.html',
   styleUrl: './images.component.css',
 })
@@ -77,6 +78,11 @@ export class ImagesComponent implements OnDestroy {
   ];
 
   activePreset = '';
+
+  // Progress Bar State
+  progressValue = 0;
+  progressStatus = '';
+  private progressInterval: any;
 
   ngOnDestroy(): void {
     this.revokePreviewUrl();
@@ -161,6 +167,10 @@ export class ImagesComponent implements OnDestroy {
     this.error = null;
     this.revokeDownloadUrl();
 
+    // Reset Progress Bar
+    this.progressValue = 0;
+    this.progressStatus = `Encoding ${this.options.format}...`;
+
     // 1. Map Resize Options
     if (this.resizeWidth && this.resizeHeight) {
       this.options.resize = { width: this.resizeWidth, height: this.resizeHeight };
@@ -180,12 +190,34 @@ export class ImagesComponent implements OnDestroy {
       this.options.crop = undefined;
     }
 
+    // Start a smooth fake progress animation that halts at 90%
+    this.progressInterval = setInterval(() => {
+      if (this.progressValue < 90) {
+        // Increment by a random amount between 5 and 15 for a natural feel
+        this.progressValue += Math.floor(Math.random() * 10) + 5;
+        if (this.progressValue > 90) this.progressValue = 90;
+      }
+    }, 300);
+
     try {
       const processedBlob = await this.imageService.convertAsync(this.selectedFile, this.options);
-      this.downloadUrl = URL.createObjectURL(processedBlob);
-      this.outputSizeBytes = processedBlob.size;
-      const originalName = this.selectedFile.name.split('.')[0];
-      this.outputFilename = `${originalName}-converted.${this.options.format.toLowerCase()}`;
+
+      // Snap progress to 100% when the promise resolves
+      clearInterval(this.progressInterval);
+      this.progressValue = 100;
+      this.progressStatus = 'Finalizing file...';
+
+      // Give the user a tiny 400ms visual delay to actually see the 100% state
+      setTimeout(() => {
+        this.downloadUrl = URL.createObjectURL(processedBlob);
+        this.outputSizeBytes = processedBlob.size;
+
+        const originalName = this.selectedFile!.name.split('.')[0];
+        this.outputFilename = `${originalName}-converted.${this.options.format.toLowerCase()}`;
+
+        this.isProcessing = false;
+      }, 400);
+
     } catch (error: any) {
       this.error = error.message || 'Failed to convert this image.';
     } finally {

@@ -17,9 +17,6 @@ export interface AudioConversionOptions {
 
     // 1 for Mono, 2 for Stereo
     channels?: 1 | 2;
-
-    // Volume multiplier (e.g., 0.5 is half volume, 1.0 is normal, 2.0 is double)
-    volumeMultiplier?: number;
 }
 
 export interface IAudioConverter {
