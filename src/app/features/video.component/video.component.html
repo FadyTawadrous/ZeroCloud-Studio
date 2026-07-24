@@ -1,1 +1,188 @@
-<p>video.component works!</p>
+<div class="container max-w-custom mx-auto py-5">
+    <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold mb-3">
+            <span class="animated-gradient-text">Video Studio</span>
+        </h2>
+        <p class="lead text-muted">Hardware-accelerated video rendering, directly in your browser.</p>
+    </div>
+
+    @if (error) {
+    <div class="alert alert-danger shadow-sm rounded-4 mb-4" role="alert">
+        {{ error }}
+    </div>
+    }
+
+    <!-- 1. Upload Zone -->
+    @if (!selectedFile) {
+    <app-drop-zone [acceptAttr]="'video/mp4, video/webm, video/quicktime, video/x-msvideo'"
+        [title]="'Drop a video file here'" [subtitle]="'Convert formats, resize, trim, or strip audio tracks'"
+        (fileSelected)="onFileSelected($event)">
+    </app-drop-zone>
+    }
+
+    @if (selectedFile) {
+    <!-- 2. The Selected File Card -->
+    <div class="card modern-card p-3 mb-4">
+        <div class="d-flex flex-row align-items-center gap-3 mb-3">
+            <div class="icon-box bg-primary text-white rounded-3 d-flex align-items-center justify-content-center"
+                style="width: 50px; height: 50px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+                    <path
+                        d="M0 12V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm6.79-6.907A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z" />
+                </svg>
+            </div>
+            <div class="flex-grow-1 min-w-0">
+                <p class="fw-bold mb-0 text-truncate">{{ selectedFile.name }}</p>
+                <p class="text-muted small mb-0">{{ originalSizeBytes | fileSize }}</p>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-medium"
+                (click)="removeFile()">
+                Remove
+            </button>
+        </div>
+
+        <!-- The Input Video Player -->
+        <div class="w-100 bg-body-tertiary rounded-3 p-2 border text-center">
+            <video controls class="w-100 rounded" style="max-height: 300px; outline: none; background: #000;">
+                <source [src]="inputPreviewUrl">
+                Your browser does not support the video element.
+            </video>
+        </div>
+    </div>
+
+    <!-- 3. Conversion Settings Bento Grid -->
+    <div class="row g-4 mb-4">
+
+        <!-- Left Column: Core Format & Resolution -->
+        <div class="col-md-6">
+            <div class="card modern-card p-4 h-100">
+                <h6 class="fw-bold mb-3 text-muted">Output Format</h6>
+                <app-format-selector [options]="availableFormats" [selectedFormat]="options.format" label=""
+                    (selectionChange)="onFormatChange($event)">
+                </app-format-selector>
+
+                <!-- Resolution -->
+                <div class="mt-4">
+                    <label class="form-label fw-bold text-muted small mb-2 tracking-wide text-uppercase">
+                        Target Resolution
+                    </label>
+                    <select class="form-select modern-select" [(ngModel)]="options.resolution">
+                        <option value="original">Match Original</option>
+                        <option value="2160">4K (2160p)</option>
+                        <option value="1080">HD (1080p)</option>
+                        <option value="720">HD (720p)</option>
+                        <option value="480">SD (480p)</option>
+                    </select>
+                </div>
+
+                <!-- Frame Rate -->
+                <div class="mt-4">
+                    <label class="form-label fw-bold text-muted small mb-2 tracking-wide text-uppercase">
+                        Frame Rate (FPS)
+                    </label>
+                    <select class="form-select modern-select" [(ngModel)]="fpsSelection">
+                        <option value="original">Match Original</option>
+                        <option value="60">60 fps (Smooth)</option>
+                        <option value="30">30 fps (Standard)</option>
+                        <option value="24">24 fps (Cinematic)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Advanced Tools -->
+        <div class="col-md-6">
+            <div class="card modern-card p-4 h-100">
+                <h6 class="fw-bold mb-3 text-muted">Advanced Tools</h6>
+
+                <!-- Bitrate Control -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold text-muted small mb-2 tracking-wide text-uppercase">
+                        Video Bitrate
+                    </label>
+                    <select class="form-select modern-select" [(ngModel)]="bitrateSelection">
+                        <option value="auto">Auto (Recommended)</option>
+                        <option value="8000000">8 Mbps (High Quality)</option>
+                        <option value="4000000">4 Mbps (Standard)</option>
+                        <option value="2000000">2 Mbps (Compressed)</option>
+                    </select>
+                </div>
+
+                <hr class="text-muted opacity-25">
+
+                <!-- Audio Strip Toggle -->
+                <div class="mb-3">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="removeAudio"
+                            [(ngModel)]="options.removeAudio">
+                        <label class="form-check-label fw-medium small" for="removeAudio">
+                            Mute / Remove Audio Track
+                        </label>
+                    </div>
+                </div>
+
+                <hr class="text-muted opacity-25">
+
+                <!-- Trimming Tool -->
+                <div class="mb-3">
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="enableTrim" [(ngModel)]="enableTrim">
+                        <label class="form-check-label fw-medium small" for="enableTrim">Trim Video (Seconds)</label>
+                    </div>
+
+                    <div class="row g-2" [class.opacity-50]="!enableTrim">
+                        <div class="col-6">
+                            <label class="form-label small fw-medium mb-1">Start Time</label>
+                            <input type="number" class="form-control modern-input" [(ngModel)]="trimStart"
+                                [disabled]="!enableTrim" min="0" placeholder="0">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-medium mb-1">End Time</label>
+                            <input type="number" class="form-control modern-input" [(ngModel)]="trimEnd"
+                                [disabled]="!enableTrim" placeholder="End">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. Execute Button -->
+    @if (isProcessing) {
+    <app-progress-bar class="mb-4 d-block w-100" [progress]="progressValue" [status]="progressStatus"
+        [showCancel]="false">
+    </app-progress-bar>
+    } @else {
+    <button class="btn btn-primary btn-lg w-100 fw-bold shadow-sm rounded-pill py-3 action-btn mb-4"
+        (click)="convertVideo()" [disabled]="isProcessing">
+        Render Video
+    </button>
+    }
+    }
+
+    <!-- 5. Download Result Card -->
+    @if (downloadUrl) {
+    <div class="card modern-card p-4 mt-2 border-success result-card">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <video controls class="me-3 rounded shadow-sm" style="height: 60px; background: #000;">
+                    <source [src]="downloadUrl" [type]="'video/' + options.format.toLowerCase()">
+                </video>
+                <div>
+                    <p class="fw-bold mb-1">{{ originalSizeBytes | fileSize }} &rarr; {{ outputSizeBytes | fileSize }}
+                    </p>
+                    @if (sizeChangePercent > 0) {
+                    <p class="text-success small fw-bold mb-0">Saved {{ sizeChangePercent }}% space!</p>
+                    } @else if (sizeChangePercent < 0) { <p class="text-warning small fw-bold mb-0">File size increased
+                        </p>
+                        }
+                </div>
+            </div>
+            <a [href]="downloadUrl" [download]="outputFilename"
+                class="btn btn-success rounded-pill fw-bold px-4 py-2 shadow-sm">
+                Download File
+            </a>
+        </div>
+    </div>
+    }
+</div>

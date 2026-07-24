@@ -1,0 +1,157 @@
+.max-w-custom {
+    max-width: 800px;
+    /* Slightly wider than the converter to fit the grid */
+}
+
+/* Gradient text */
+.animated-gradient-text {
+    background: linear-gradient(to right, #ec4899, #8b5cf6, #06b6d4, #ec4899);
+    background-size: 200% auto;
+    color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+    animation: shineText 5s linear infinite;
+}
+
+@keyframes shineText {
+    to {
+        background-position: 200% center;
+    }
+}
+
+/* Base Bento Card */
+.modern-card {
+    background-color: var(--nav-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 1.5rem;
+    transition: border-color 0.3s ease;
+}
+
+.modern-card:hover {
+    border-color: rgba(var(--bs-primary-rgb), 0.3);
+}
+
+/* Image Thumbnails */
+.file-preview-thumb {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 1rem;
+    background-color: var(--bs-secondary-bg);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.min-w-0 {
+    min-width: 0;
+}
+
+/* Tracking utility for small caps labels */
+.tracking-wide {
+    letter-spacing: 1px;
+}
+
+/* Modern Inputs & Selects inside the Bento Grid */
+.modern-select,
+.modern-input {
+    background-color: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.85rem;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+
+    /* Explicitly set text color and force native dark-mode UI */
+    color: var(--bs-body-color);
+    color-scheme: dark;
+}
+
+/* Explicitly style the options to override OS-level white backgrounds */
+.modern-select option {
+    background-color: var(--bs-body-bg);
+    color: var(--bs-body-color);
+}
+
+.modern-select:focus,
+.modern-input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.15);
+}
+
+.modern-select:hover,
+.modern-input:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+    border-color: rgba(var(--bs-primary-rgb), 0.5);
+    color: var(--bs-body-color);
+}
+
+/* Lock Button */
+.lock-btn {
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    transition: all 0.2s ease;
+}
+
+.lock-btn:hover {
+    background-color: var(--hover-bg);
+    border-color: var(--accent-color);
+}
+
+/* Execute Button */
+.action-btn {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    border: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.action-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3) !important;
+}
+
+/* Custom Range Slider Styling to match theme */
+.custom-range::-webkit-slider-thumb {
+    background: var(--accent-color);
+}
+
+.custom-range::-moz-range-thumb {
+    background: var(--accent-color);
+}
+
+/* Success Result highlighting */
+.border-success {
+    border-color: #10b981 !important;
+    background-color: rgba(16, 185, 129, 0.05) !important;
+}
+
+.btn-success {
+    background-color: #10b981;
+    border: none;
+}
+
+.btn-success:hover {
+    background-color: #059669;
+}
+
+/* Styling for buttons that look like inputs (Launch Cropper) */
+button.modern-input {
+    color: var(--bs-body-color);
+    transition: all 0.3s ease;
+}
+
+button.modern-input:hover {
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+    /* Slight tint of your accent color */
+    border-color: rgba(var(--bs-primary-rgb), 0.5);
+    color: var(--bs-body-color);
+    /* Ensures text stays perfectly readable */
+}
+
+/* Optional: Slight color shift for the arrow icon on hover to make it feel alive */
+button.modern-input:hover .text-muted {
+    color: var(--accent-color) !important;
+}

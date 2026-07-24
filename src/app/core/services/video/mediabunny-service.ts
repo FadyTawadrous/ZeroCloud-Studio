@@ -1,81 +1,102 @@
 import { Injectable, signal } from '@angular/core';
+import {
+  Input,
+  Output,
+  Conversion,
+  ALL_FORMATS,
+  BlobSource,
+  BufferTarget,
+  Mp4OutputFormat,
+  WebMOutputFormat
+} from 'mediabunny';
+
 import { IVideoConverter, VideoConversionOptions } from '../../interfaces/ivideo-converter';
+import { acceptFor, VideoOutputFormat } from '../../constants/supported-formats';
 
 @Injectable({
   providedIn: 'root'
 })
-export class MediabunnyService {
+export class MediabunnyService implements IVideoConverter {
 
-  // Signals for reactive UI binding
-  public isProcessing = signal<boolean>(false);
-  public progress = signal<number>(0);
-  public status = signal<string>('Idle');
-  public error = signal<string | null>(null);
-  public finalFile = signal<File | null>(null);
+  async convertAsync(file: File, options: VideoConversionOptions): Promise<Blob> {
+    // 1. Prepare the Input stream
+    const input = new Input({
+      source: new BlobSource(file),
+      formats: ALL_FORMATS,
+    });
 
-  private worker: Worker | null = null;
+    // 2. Select the correct output format wrapper
+    const outputFormat = this.getOutputFormat(options.format);
 
-  processVideo(file: File, formatFrom: string, formatTo: string) {
-    this.resetState();
-    this.isProcessing.set(true);
+    // 3. Prepare the Output to write directly to memory
+    const target = new BufferTarget();
+    const output = new Output({
+      format: outputFormat,
+      target: target,
+    });
 
-    if (typeof Worker !== 'undefined') {
-      // Initialize the worker pointing to our worker file
-      this.worker = new Worker(new URL('../../../features/video.component/mediabunny.worker', import.meta.url), {
-        type: 'module'
-      });
+    // 4. Configure the conversion pipeline
+    const conversionConfig: any = {
+      input,
+      output,
+      video: {}
+    };
 
-      // Listen for messages coming back from the background thread
-      this.worker.onmessage = ({ data }) => {
-        switch (data.type) {
-          case 'STATUS':
-            this.status.set(data.status);
-            break;
-          case 'PROGRESS':
-            this.progress.set(data.progress);
-            break;
-          case 'COMPLETE':
-            this.finalFile.set(data.result);
-            this.cleanup();
-            break;
-          case 'ERROR':
-            this.error.set(data.error);
-            this.cleanup();
-            break;
-        }
-      };
-
-      // Send the file to the background thread to start processing
-      this.worker.postMessage({ action: 'PROCESS', file, formatFrom, formatTo });
-
+    // Apply Audio Track Configuration
+    if (options.removeAudio) {
+      conversionConfig.audio = { discard: true };
     } else {
-      // Fallback if the user's browser is severely outdated
-      this.error.set('Web Workers are not supported in this browser.');
-      this.isProcessing.set(false);
+      conversionConfig.audio = { bitrate: 192000 }; // Default audio bitrate if not removing audio, 192 kbps (High Quality)
     }
-  }
 
-  cancel() {
-    if (this.worker) {
-      this.worker.terminate(); // Instantly kills the background thread
-      this.error.set('Processing was canceled by the user.');
-      this.cleanup();
+    // Apply Target Resolution (Height)
+    // By passing just the height, Mediabunny/WebCodecs automatically calculates 
+    // the correct width to maintain the original aspect ratio!
+    if (options.resolution && options.resolution !== 'original') {
+      // parseInt('1080p') safely returns the integer 1080
+      conversionConfig.video.height = parseInt(options.resolution, 10);
     }
+
+    // Apply Video Bitrate
+    if (options.videoBitrate) {
+      conversionConfig.video.bitrate = options.videoBitrate;
+    }
+
+    // Apply Frame Rate (FPS)
+    if (options.fps) {
+      conversionConfig.video.frameRate = options.fps;
+    }
+
+    // Apply Trimming Time Range
+    if (options.trim) {
+      conversionConfig.trim = {
+        start: options.trim.startSeconds,
+        end: options.trim.endSeconds
+      };
+    }
+
+    // 5. Initialize and execute the hardware-accelerated video conversion
+    const conversion = await Conversion.init(conversionConfig);
+    await conversion.execute();
+
+    // 6. Extract the final buffer
+    if (!target.buffer) {
+      throw new Error('Video conversion failed: No output data was generated.');
+    }
+
+    const mimeType = acceptFor(options.format);
+    return new Blob([target.buffer], { type: mimeType });
   }
 
-  resetState() {
-    this.isProcessing.set(false);
-    this.progress.set(0);
-    this.status.set('Idle');
-    this.error.set(null);
-    this.finalFile.set(null);
-  }
-
-  private cleanup() {
-    this.isProcessing.set(false);
-    if (this.worker) {
-      this.worker.terminate();
-      this.worker = null;
+  /**
+   * Helper function to map strict format strings to Mediabunny's specific output classes.
+   */
+  private getOutputFormat(format: VideoOutputFormat) {
+    switch (format) {
+      case 'MP4': return new Mp4OutputFormat();
+      case 'WEBM': return new WebMOutputFormat();
+      default:
+        throw new Error(`Unsupported output format for video pipeline: ${format}`);
     }
   }
 }
