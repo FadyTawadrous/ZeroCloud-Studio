@@ -3,7 +3,7 @@
 
     <!-- Hidden file input triggered by the label -->
     <input id="file-input-{{ title }}" type="file" class="visually-hidden" [accept]="acceptAttr"
-        (change)="onFileBrowse($event)" [disabled]="disabled" />
+        (change)="onFileBrowse($event)" [disabled]="disabled" [multiple]="multiple" />
 
     <label class="dropzone-label d-flex flex-column align-items-center justify-content-center p-5 m-0"
         for="file-input-{{ title }}">
