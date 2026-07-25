@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Modern Bootstrap Primary Blue to Dark Navy Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d6efd" />
+      <stop offset="100%" stop-color="#031633" />
+    </linearGradient>
+
+    <!-- This mask cuts the "Zero/Offline" slash directly out of the cloud -->
+    <mask id="slashMask">
+      <rect width="512" height="512" fill="white" />
+      <line x1="146" y1="365" x2="366" y2="145" stroke="black" stroke-width="46" stroke-linecap="round" />
+    </mask>
+  </defs>
+
+  <!-- App Icon Background -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+
+  <!-- Cloud Silhouette -->
+  <path mask="url(#slashMask)" d="M 373 230 C 373 174.77 328.23 130 273 130 C 227.28 130 188.74 160.85 176.23 203.4 C 169.38 201.2 161.85 200 154 200 C 115.34 200 84 231.34 84 270 C 84 308.66 115.34 340 154 340 L 373 340 C 403.37 340 428 315.37 428 285 C 428 254.63 403.37 230 373 230 Z" fill="#ffffff" />
+</svg>
