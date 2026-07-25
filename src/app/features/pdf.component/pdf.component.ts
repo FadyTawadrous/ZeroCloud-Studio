@@ -33,9 +33,11 @@ export class PdfComponent implements OnDestroy {
   selectedAction: PdfConversionOptions['action'] = 'merge';
 
   // Dynamic Option Fields
-  extractPageRange = '';
-  rotatePageRange = '';
-  pageOrderStr = '';
+  toolState = {
+    extractRange: '',
+    rotateRange: '',
+    organizeOrder: ''
+  };
   rotationAngle: 90 | 180 | 270 = 90;
   imageFormat: 'JPEG' | 'PNG' = 'JPEG';
   imageQuality: 'high' | 'medium' | 'low' = 'high';
@@ -63,9 +65,9 @@ export class PdfComponent implements OnDestroy {
   changeAction(action: PdfConversionOptions['action']) {
     this.selectedAction = action;
     this.error = null;
-    this.extractPageRange = '';
-    this.rotatePageRange = '';
-    this.pageOrderStr = '';
+    this.toolState.extractRange = '';
+    this.toolState.rotateRange = '';
+    this.toolState.organizeOrder = '';
   }
 
   async processDocument() {
@@ -87,19 +89,23 @@ export class PdfComponent implements OnDestroy {
     this.progressValue = 0;
     this.progressStatus = `Executing ${this.selectedAction} pipeline...`;
 
+    // FIX: Bulletproof, explicit mapping that avoids ternary confusion
+    let finalPageRange: string | undefined = undefined;
+    if (this.selectedAction === 'extract' && this.toolState.extractRange.trim() !== '') {
+      finalPageRange = this.toolState.extractRange.trim();
+    } else if (this.selectedAction === 'rotate' && this.toolState.rotateRange.trim() !== '') {
+      finalPageRange = this.toolState.rotateRange.trim();
+    }
+
     // Map UI to Options
     const options: PdfConversionOptions = {
       action: this.selectedAction,
-
-      pageRange: this.selectedAction === 'extract'
-        ? (this.extractPageRange ? this.extractPageRange.trim() : undefined)
-        : (this.rotatePageRange ? this.rotatePageRange.trim() : undefined),
-
+      pageRange: finalPageRange,
       rotationAngle: this.rotationAngle,
       imageOutputFormat: this.imageFormat,
       quality: this.imageQuality,
-      pageOrder: this.selectedAction === 'organize' && this.pageOrderStr
-        ? this.pageOrderStr.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n))
+      pageOrder: this.selectedAction === 'organize' && this.toolState.organizeOrder.trim() !== ''
+        ? this.toolState.organizeOrder.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n))
         : undefined
     };
 

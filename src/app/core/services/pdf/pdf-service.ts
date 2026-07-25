@@ -161,7 +161,6 @@ export class PdfService implements IPdfConverter {
   }
 
   /** ACTION: Rotate specific pages (or all pages) */
-  /** ACTION: Rotate specific pages (or all pages) */
   private async rotatePdf(file: File, options: PdfConversionOptions): Promise<Blob> {
     const angle = options.rotationAngle || 90;
     const sourceBytes = await file.arrayBuffer();

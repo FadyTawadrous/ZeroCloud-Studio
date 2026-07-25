@@ -74,7 +74,7 @@
                 @switch (selectedAction) {
                 @case ('extract') {
                 <label class="form-label fw-bold text-muted small mb-2 tracking-wide text-uppercase">Page Range</label>
-                <input type="text" class="form-control modern-input" name="extractRange" [(ngModel)]="extractPageRange"
+                <input type="text" class="form-control modern-input" name="extractRange" [(ngModel)]="toolState.extractRange"
                     placeholder="e.g. 1, 3, 5-10">
                 <small class="text-muted mt-2 d-block">Specify which pages to pull into a new document.</small>
                 }
@@ -88,13 +88,13 @@
                 </select>
                 <label class="form-label fw-bold text-muted small mb-2 tracking-wide text-uppercase">Target Pages
                     (Optional)</label>
-                <input type="text" class="form-control modern-input" name="rotateRange" [(ngModel)]="rotatePageRange"
+                <input type="text" class="form-control modern-input" name="rotateRange" [(ngModel)]="toolState.rotateRange"
                     placeholder="e.g. 1, 4-5 (Leave blank for all)">
                 }
                 @case ('organize') {
                 <label class="form-label fw-bold text-muted small mb-2 tracking-wide text-uppercase">New Page
                     Order</label>
-                <input type="text" class="form-control modern-input" name="organizeOrder" [(ngModel)]="pageOrderStr"
+                <input type="text" class="form-control modern-input" name="organizeOrder" [(ngModel)]="toolState.organizeOrder"
                     placeholder="e.g. 3, 1, 2, 2">
                 <small class="text-muted mt-2 d-block">Rearrange, delete, or duplicate pages. Example: '3, 1, 2' moves
                     page 3 to the front.</small>

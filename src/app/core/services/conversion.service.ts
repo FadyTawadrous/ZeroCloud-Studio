@@ -1,10 +1,9 @@
 import { Injectable, signal, inject } from '@angular/core';
 
-// We will build these specialized services next
-// import { VideoService } from './video/video.service';
-// import { ImageService } from './images/image.service';
-// import { AudioService } from './audio/audio.service';
-// import { PdfService } from './pdf/pdf.service';
+import { MediabunnyService } from './video/mediabunny-service';
+import { PhotonService } from './images/photon-service';
+import { AudioService } from './audio/audio-service';
+import { PdfService } from './pdf/pdf-service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,16 +15,17 @@ export class ConversionService {
   public isProcessing = signal<boolean>(false);
   public error = signal<string | null>(null);
 
-  // Injected specialized services (commented out until we build them)
-  // private videoService = inject(VideoService);
-  // private imageService = inject(ImageService);
-  // private audioService = inject(AudioService);
-  // private pdfService = inject(PdfService);
+  // Injected specialized engines
+  private videoService = inject(MediabunnyService);
+  private imageService = inject(PhotonService);
+  private audioService = inject(AudioService);
+  private pdfService = inject(PdfService);
 
   // Keep track of which service is currently running so we can cancel it
   private activeServiceType: 'video' | 'image' | 'audio' | 'pdf' | null = null;
 
-  public processFile(file: File, formatFrom: string, formatTo: string) {
+  // We make this async to handle the Promises returned by your engines
+  public async processFile(file: File, formatFrom: string, formatTo: string) {
     if (this.isProcessing()) {
       this.error.set('A conversion is already in progress.');
       return;
@@ -35,36 +35,81 @@ export class ConversionService {
     this.isProcessing.set(true);
 
     const type = this.determineCategory(formatFrom);
+    const target = formatTo.toUpperCase();
 
     try {
+      let resultBlob: Blob;
+      let finalExtension = target.toLowerCase();
+
+      // Fake progress interval for engines that don't emit live progress yet
+      this.startSimulatedProgress(type);
+
       switch (type) {
         case 'video':
           this.activeServiceType = 'video';
-          // NOTE: We will wire this up to the VideoService next
-          this.simulateWork('VideoEngine', formatFrom, formatTo, file);
+          this.status.set(`Transcoding Video to ${target}...`);
+
+          // FIX: Wrap the target string in the expected options object
+          resultBlob = await this.videoService.convertAsync(file, {
+            format: target.toLowerCase() as any // Change 'format' if your interface uses 'outputFormat' or something else
+            // You can add default fallback options here (e.g., quality: 'high')
+          });
           break;
+
         case 'image':
           this.activeServiceType = 'image';
-          // this.imageService.convert(file, options);
-          this.simulateWork('Photon Engine', formatFrom, formatTo, file);
+          this.status.set(`Converting Image to ${target}...`);
+
+          if (target === 'PDF') {
+            this.activeServiceType = 'pdf';
+            resultBlob = await this.pdfService.processAsync([file], { action: 'images-to-pdf' });
+          } else {
+            // FIX: Wrap the target string in the expected options object
+            resultBlob = await this.imageService.convertAsync(file, {
+              format: target.toLowerCase() as any
+            });
+          }
           break;
+
         case 'audio':
           this.activeServiceType = 'audio';
-          // this.audioService.convert(file, options);
-          this.simulateWork('AudioEngine', formatFrom, formatTo, file);
+          this.status.set(`Transcoding Audio to ${target}...`);
+
+          // FIX: Wrap the target string in the expected options object
+          resultBlob = await this.audioService.convertAsync(file, {
+            format: target.toLowerCase() as any
+          });
           break;
+
         case 'pdf':
           this.activeServiceType = 'pdf';
-          // this.pdfService.process([file], options);
-          this.simulateWork('PDF Engine', formatFrom, formatTo, file);
+          this.status.set(`Processing PDF...`);
+
+          if (['JPEG', 'PNG', 'JPG'].includes(target)) {
+            resultBlob = await this.pdfService.processAsync([file], {
+              action: 'pdf-to-images',
+              imageOutputFormat: target as any,
+              quality: 'high'
+            });
+            finalExtension = 'zip';
+          } else {
+            resultBlob = await this.pdfService.processAsync([file], { action: 'compress' });
+          }
           break;
+
         default:
-          this.error.set(`Processing for ${formatFrom} is not implemented yet.`);
-          this.isProcessing.set(false);
+          throw new Error(`Processing for ${formatFrom} is not implemented yet.`);
       }
+
+      // Finalize successful conversion
+      this.completeProgress();
+      this.handleDownload(resultBlob, `${file.name.split('.')[0]}_converted.${finalExtension}`);
+
     } catch (err: any) {
       this.error.set(err.message || 'An error occurred routing the file.');
       this.isProcessing.set(false);
+      this.status.set('Failed');
+      this.progress.set(0);
     }
   }
 
@@ -79,11 +124,17 @@ export class ConversionService {
       case 'image':
         // this.imageService.cancel();
         break;
-      // ... same for others
+      case 'audio':
+        // this.audioService.cancel();
+        break;
+      case 'pdf':
+        // PDF-lib runs entirely in memory and is usually instantaneous, but you can add abort controllers later
+        break;
     }
 
     this.isProcessing.set(false);
     this.status.set('Cancelled');
+    this.progress.set(0);
     this.activeServiceType = null;
   }
 
@@ -104,31 +155,24 @@ export class ConversionService {
     return 'unknown';
   }
 
-  /**
-   * TEMPORARY: Simulates processing so the UI works while we build the actual engines.
-   */
-  private simulateWork(engineName: string, from: string, to: string, file: File) {
-    this.status.set(`Initializing ${engineName}...`);
-    let p = 0;
-
-    const interval = setInterval(() => {
-      p += 10;
-      this.progress.set(p);
-      this.status.set(`Transcoding ${from} to ${to}...`);
-
-      if (p >= 100) {
-        clearInterval(interval);
-        if (this.isProcessing()) {
-          this.status.set('Done!');
-          this.isProcessing.set(false);
-          this.activeServiceType = null;
-
-          // Create a dummy Blob for the simulation
-          const dummyBlob = new Blob(['simulated data'], { type: 'application/octet-stream' });
-          this.handleDownload(dummyBlob, `converted.${to.toLowerCase()}`);
-        }
+  // A generic progress simulator to keep the UI feeling alive while we await the backend promises
+  private progressInterval: any;
+  private startSimulatedProgress(engineName: string) {
+    this.progress.set(0);
+    this.progressInterval = setInterval(() => {
+      let current = this.progress();
+      if (current < 90) {
+        this.progress.set(current + Math.floor(Math.random() * 10) + 2);
       }
-    }, 200);
+    }, 300);
+  }
+
+  private completeProgress() {
+    clearInterval(this.progressInterval);
+    this.progress.set(100);
+    this.status.set('Done!');
+    this.isProcessing.set(false);
+    this.activeServiceType = null;
   }
 
   /**
@@ -144,5 +188,4 @@ export class ConversionService {
     document.body.removeChild(anchor);
     window.URL.revokeObjectURL(url);
   }
-
 }

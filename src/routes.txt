@@ -1,4 +1,0 @@
-/png-to-webp
-/mov-to-mp4
-/wav-to-mp3
-/jpeg-to-png
