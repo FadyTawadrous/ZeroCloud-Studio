@@ -14,8 +14,8 @@
 
     <!-- 1. Upload Zone -->
     @if (!selectedFile) {
-    <app-drop-zone [acceptAttr]="'image/png, image/jpeg, image/webp, image/bmp, image/tiff'"
-        [title]="'Click or drag an image here'" [subtitle]="'Supports PNG, JPG, WebP, AVIF, TIFF'"
+    <app-drop-zone [acceptAttr]="'image/png, image/jpeg, image/webp, image/bmp, image/tiff, image/x-tga, image/svg+xml'"
+        [title]="'Click or drag an image here'" [subtitle]="'Supports PNG, JPG, WebP, AVIF, TIFF, SVG'"
         (fileSelected)="onFileSelected($event)">
     </app-drop-zone>
     }

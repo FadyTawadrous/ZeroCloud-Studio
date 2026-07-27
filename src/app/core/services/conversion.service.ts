@@ -149,7 +149,7 @@ export class ConversionService {
   private determineCategory(format: string): 'video' | 'image' | 'audio' | 'pdf' | 'unknown' {
     const f = format.toUpperCase();
     if (['MP4', 'WEBM', 'MOV', 'MKV', 'AV1'].includes(f)) return 'video';
-    if (['PNG', 'JPG', 'JPEG', 'WEBP', 'AVIF', 'ICO', 'BMP', 'TIFF'].includes(f)) return 'image';
+    if (['PNG', 'JPG', 'JPEG', 'WEBP', 'AVIF', 'ICO', 'BMP', 'TIFF', 'SVG'].includes(f)) return 'image';
     if (['MP3', 'WAV', 'OGG', 'FLAC', 'AAC', 'OPUS'].includes(f)) return 'audio';
     if (['PDF'].includes(f)) return 'pdf';
     return 'unknown';

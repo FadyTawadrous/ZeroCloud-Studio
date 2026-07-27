@@ -5,7 +5,7 @@
 // --- STRICT TYPES FOR INTERFACES ---
 export type SupportedVideoFormat = 'MP4' | 'WEBM' | 'MOV' | 'MKV' | 'AV1';
 export type SupportedAudioFormat = 'MP3' | 'WAV' | 'OGG' | 'FLAC' | 'AAC' | 'OPUS';
-export type SupportedImageFormat = 'PNG' | 'JPG' | 'JPEG' | 'WEBP' | 'AVIF' | 'ICO' | 'BMP' | 'TGA' | 'TIFF' | 'TIF';
+export type SupportedImageFormat = 'PNG' | 'JPG' | 'JPEG' | 'WEBP' | 'AVIF' | 'ICO' | 'BMP' | 'TGA' | 'TIFF' | 'TIF' | 'SVG';
 
 // Extract subsets for output interfaces (since some formats are input-only)
 export type ImageOutputFormat = 'PNG' | 'JPG' | 'JPEG' | 'WEBP' | 'AVIF' | 'ICO';
@@ -35,6 +35,7 @@ export const SUPPORTED_CONVERSIONS: Record<string, string[]> = {
   WEBP: ['PNG', 'JPG', 'AVIF', 'ICO'],
   AVIF: ['PNG', 'JPG', 'WEBP', 'ICO'],
   ICO: ['PNG', 'JPG', 'WEBP', 'AVIF'],
+  SVG: ['PNG', 'JPG', 'WEBP', 'AVIF', 'ICO'],
 
   // Input-only image formats (uncompressed/legacy)
   BMP:  ['PNG', 'JPG', 'WEBP', 'AVIF', 'ICO'],
@@ -77,6 +78,7 @@ const ACCEPT_MAP: Record<string, string> = {
   TGA:  'image/x-tga',
   TIFF: 'image/tiff',
   TIF:  'image/tiff',
+  SVG:  'image/svg+xml'
 };
 
 export function acceptFor(format: string): string {
