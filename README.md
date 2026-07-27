@@ -1,59 +1,22 @@
-# LocalConverter
+# ZeroCloud Studio
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.3.
+A 100% offline, client-side Progressive Web App (PWA) for processing media and documents directly in the browser. 
 
-## Development server
+No servers, no uploads, zero privacy risks.
 
-To start a local development server, run:
+## Features
+* **PDF Studio:** Merge, split, rotate, and extract PDFs using `pdf-lib`.
+* **Image Engine:** Crop, convert, and scale images (JPEG, PNG, WEBP) using `cropperjs, and photon`.
+* **Video/Audio Transcoding:** Local media conversion powered by WebAssembly.
+* **Offline-First:** Fully installable PWA that works in airplane mode.
 
-```bash
-ng serve
-```
+## Tech Stack
+* **Framework:** Angular 20 (Standalone Components)
+* **Styling:** Bootstrap 5 & Custom CSS Variables
+* **Architecture:** Lazy-loaded routing and modular service engines
+* **Build:** Strict TypeScript with esbuild
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Running Locally
+1. `npm install`
+2. `ng serve` for development
+3. `ng build` followed by `npx http-server -p 8080 dist/local-converter/browser` to test the PWA offline.
