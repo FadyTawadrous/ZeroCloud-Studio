@@ -58,16 +58,6 @@
     border-radius: 0.85rem;
     padding: 0.5rem 1rem;
     font-weight: 500;
-
-    /* Explicitly set text color and force native dark-mode UI */
-    color: var(--bs-body-color);
-    color-scheme: dark;
-}
-
-/* Explicitly style the options to override OS-level white backgrounds */
-.modern-select option {
-    background-color: var(--bs-body-bg);
-    color: var(--bs-body-color);
 }
 
 .modern-select:focus,
