@@ -2,7 +2,8 @@
 .navbar-glass {
     background-color: var(--nav-bg) !important;
     backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px); /* For Safari support */
+    -webkit-backdrop-filter: blur(12px);
+    /* For Safari support */
     border-bottom: 1px solid var(--bs-border-color);
     z-index: 1030;
 }
@@ -69,4 +70,26 @@
     color: var(--accent-color) !important;
     transform: translateY(-2px);
     /* Subtle lift effect on hover */
+}
+
+/* PayPal Button */
+.btn-paypal {
+    background-color: #0070ba;
+    color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 0.4rem 1.2rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.btn-paypal:hover,
+.btn-paypal:focus-visible {
+    background-color: #fff;
+    /* Slightly darker on hover */
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 112, 186, 0.3) !important;
+}
+
+[data-bs-theme="dark"] .btn-paypal {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
