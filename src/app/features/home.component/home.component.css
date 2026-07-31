@@ -1,3 +1,4 @@
+/* Typography & Utilities */
 .max-w-custom {
     max-width: 800px;
 }
@@ -8,6 +9,13 @@
 
 .cursor-pointer {
     cursor: pointer;
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-info) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 /* Trust badge above the hero */
@@ -58,12 +66,12 @@
     translate: -50% 0;
     width: 600px;
     height: 400px;
-    background: radial-gradient(circle, rgba(var(--bs-primary-rgb), 0.18) 0%, rgba(var(--bs-primary-rgb), 0) 70%);
+    background: radial-gradient(circle, rgba(var(--bs-primary-rgb), 0.15) 0%, rgba(var(--bs-primary-rgb), 0) 70%);
     z-index: -1;
     pointer-events: none;
 }
 
-/* Icon badges: tinted circular backgrounds instead of flat icon color */
+/* Icon badges */
 .icon-badge {
     width: 56px;
     height: 56px;
@@ -143,10 +151,4 @@
         transition: none;
         animation: none;
     }
-}
-
-h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--accent-color);
 }
