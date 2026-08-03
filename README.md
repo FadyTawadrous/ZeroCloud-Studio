@@ -29,8 +29,9 @@ ZeroCloud Studio is built with modern, strict web standards to ensure a lightwei
 * **Styling & UI:** Bootstrap 5, Custom CSS Variables, Responsive Grid
 * **Core Processing:** 
   * `Mediabunny` (Audio/Video Transcoding)
-  * `Photon Wasm` (Image Manipulation)
-  * `pdf-lib` (Document Parsing)
+  * `Photon Wasm , Cropperjs` (Image Manipulation)
+  * `pdf-lib , pdfjs-dist` (Document Parsing)
+  * `jszip` (creating zip archives)
 * **Performance:** Lazy-loaded routing and modular service engines to keep the initial load under 4MB.
 * **CI/CD:** Automated GitHub Actions pipeline for linting, deployed securely to the Cloudflare Pages global edge network.
 
