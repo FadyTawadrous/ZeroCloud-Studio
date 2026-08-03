@@ -48,19 +48,20 @@ Want to test the application or contribute? Follow these steps to spin up the en
 ### Installation
 
 1. **Clone the repository:**
-   ```bash
-   git clone [https://github.com/FadyTawadrous/ZeroCloud-Studio.git]
-   cd ZeroCloud-Studio
+```bash
+git clone [https://github.com/FadyTawadrous/ZeroCloud-Studio.git]
+cd ZeroCloud-Studio
+```
 
 2. **Install dependencies:**
-```bash
-npm install
-```
+  ```bash
+  npm install
+  ```
 
 3. **Run the development server**
-```bash
-ng serve
-```
+  ```bash
+  ng serve
+  ```
 
 ## Testing the PWA (Production Build)
 To test the offline Service Worker capabilities, you must run the compiled production build:
