@@ -58,7 +58,7 @@ export class DropZone {
   onFileBrowse(event: Event) {
     const input = event.target as HTMLInputElement;
 
-    // FIX 2: Ensure input.files exists before passing it to Array.from()
+    // Ensure input.files exists before passing it to Array.from()
     if (input.files && input.files.length > 0) {
       this.handleFiles(Array.from(input.files));
     }

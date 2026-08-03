@@ -1,7 +1,3 @@
-// Core conversion matrix for Version 1 (Pure WebCodecs + WebAssembly)
-// Legacy formats (WMA, WMV, FLV, AVI) are intentionally excluded for V1 
-// to maintain a lightweight, high-performance architecture.
-
 // --- STRICT TYPES FOR INTERFACES ---
 export type SupportedVideoFormat = 'MP4' | 'WEBM' | 'MOV' | 'MKV' | 'AV1';
 export type SupportedAudioFormat = 'MP3' | 'WAV' | 'OGG' | 'FLAC' | 'AAC' | 'OPUS';
@@ -17,7 +13,7 @@ export const SUPPORTED_CONVERSIONS: Record<string, string[]> = {
   MP4: ['WEBM', 'MOV', 'MP3', 'WAV'], // Video to Video / Video to Audio
   WEBM: ['MP4', 'MOV', 'MP3', 'WAV'],
   MOV: ['MP4', 'WEBM', 'MP3', 'WAV'],
-  MKV: ['MP4', 'WEBM', 'MOV', 'MP3', 'WAV'], // MKV is heavy, often input-only, but transcodable
+  MKV: ['MP4', 'WEBM', 'MOV', 'MP3', 'WAV'],
   AV1:  ['MP4', 'WEBM', 'MOV', 'MP3', 'WAV'],
 
   // --- AUDIO (Powered by Mediabunny) ---

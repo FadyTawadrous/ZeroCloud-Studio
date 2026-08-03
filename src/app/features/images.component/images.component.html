@@ -167,7 +167,6 @@
                     </div>
                 </div>
 
-                <!-- Add the Modal Component at the very bottom of the file (before the closing </div> of the container) -->
                 @if (showCropperModal && previewUrl) {
                 <app-image-cropper [imageUrl]="previewUrl" (cropApplied)="onCropApplied($event)"
                     (modalClosed)="closeCropper()">

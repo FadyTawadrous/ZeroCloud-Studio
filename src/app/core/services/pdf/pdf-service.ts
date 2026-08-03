@@ -1,10 +1,7 @@
 import { Injectable } from '@angular/core';
 import { degrees, PDFDocument } from 'pdf-lib';
-// import * as pdfjsLib from 'pdfjs-dist';
 import JSZip from 'jszip';
 import { IPdfConverter, PdfConversionOptions } from '../../interfaces/ipdf-converter';
-
-// pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdfjs/pdf.worker.min.mjs';
 
 @Injectable({
   providedIn: 'root',

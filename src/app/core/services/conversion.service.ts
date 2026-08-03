@@ -48,11 +48,8 @@ export class ConversionService {
         case 'video':
           this.activeServiceType = 'video';
           this.status.set(`Transcoding Video to ${target}...`);
-
-          // FIX: Wrap the target string in the expected options object
           resultBlob = await this.videoService.convertAsync(file, {
-            format: target.toLowerCase() as any // Change 'format' if your interface uses 'outputFormat' or something else
-            // You can add default fallback options here (e.g., quality: 'high')
+            format: target.toLowerCase() as any
           });
           break;
 
@@ -64,7 +61,6 @@ export class ConversionService {
             this.activeServiceType = 'pdf';
             resultBlob = await this.pdfService.processAsync([file], { action: 'images-to-pdf' });
           } else {
-            // FIX: Wrap the target string in the expected options object
             resultBlob = await this.imageService.convertAsync(file, {
               format: target.toLowerCase() as any
             });
@@ -74,8 +70,6 @@ export class ConversionService {
         case 'audio':
           this.activeServiceType = 'audio';
           this.status.set(`Transcoding Audio to ${target}...`);
-
-          // FIX: Wrap the target string in the expected options object
           resultBlob = await this.audioService.convertAsync(file, {
             format: target.toLowerCase() as any
           });
@@ -106,6 +100,7 @@ export class ConversionService {
       this.handleDownload(resultBlob, `${file.name.split('.')[0]}_converted.${finalExtension}`);
 
     } catch (err: any) {
+      clearInterval(this.progressInterval);
       this.error.set(err.message || 'An error occurred routing the file.');
       this.isProcessing.set(false);
       this.status.set('Failed');
@@ -115,6 +110,8 @@ export class ConversionService {
 
   public cancel() {
     if (!this.isProcessing()) return;
+
+    clearInterval(this.progressInterval);
 
     // Route the cancellation to the active service
     switch (this.activeServiceType) {

@@ -9,7 +9,7 @@
         Converting <strong>{{ formatFrom }}</strong> to <strong>{{ formatTo }}</strong> isn't supported yet.
     </div>
     } @else {
-    <!-- OUR NEW DROP ZONE BLOCK -->
+    <!-- DROP ZONE BLOCK -->
     <app-drop-zone class="mb-4 d-block" [acceptAttr]="acceptAttr"
         [title]="'Click or drag a ' + formatFrom + ' file here'" [disabled]="conversionService.isProcessing()"
         (fileSelected)="onFileSelected($event)">
@@ -29,7 +29,7 @@
     }
 
     @if (conversionService.isProcessing()) {
-    <!-- OUR NEW PROGRESS BAR BLOCK -->
+    <!-- PROGRESS BAR BLOCK -->
     <app-progress-bar class="mt-4 d-block" [progress]="conversionService.progress()"
         [status]="conversionService.status()" (cancel)="onCancel()">
     </app-progress-bar>

@@ -13,8 +13,8 @@ addEventListener('message', async (event: MessageEvent) => {
   try {
     // 2. EXPLICITLY BOOT THE WEBASSEMBLY ENGINE
     if (!wasmInitialized) {
-      // Pointing to the public folder where we will store the raw WASM binary
-      await init({ module_or_path: '/wasm/photon_rs_bg.wasm' });
+      // Pointing to the automated folder created by angular.json
+      await init({ module_or_path: '/photon/photon_rs_bg.wasm' });
       wasmInitialized = true;
     }
 
