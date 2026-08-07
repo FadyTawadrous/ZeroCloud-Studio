@@ -97,6 +97,7 @@ export class ConversionService {
 
       // Finalize successful conversion
       this.completeProgress();
+      this.pingTelemetry(this.activeServiceType as 'video' | 'image' | 'audio' | 'pdf'); // ping telemetry is fire-and-forget, so we don't await it
       this.handleDownload(resultBlob, `${file.name.split('.')[0]}_converted.${finalExtension}`);
 
     } catch (err: any) {
@@ -185,4 +186,20 @@ export class ConversionService {
     document.body.removeChild(anchor);
     window.URL.revokeObjectURL(url);
   }
+
+  private async pingTelemetry(pipelineType: 'video' | 'image' | 'audio' | 'pdf') {
+    if (!navigator.onLine) return; // Fail silently if fully offline
+
+    try {
+      fetch('https://telemetry-worker.fadytawadrous3.workers.dev/track', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pipeline: pipelineType }),
+        keepalive: true // Crucial: Ensures it sends even if they immediately close the tab
+      });
+    } catch (e) {
+      // Analytics should never crash the app, so we swallow any network errors
+    }
+  }
+
 }
