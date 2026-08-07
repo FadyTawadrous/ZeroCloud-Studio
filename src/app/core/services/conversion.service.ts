@@ -189,18 +189,23 @@ export class ConversionService {
   }
 
   private async pingTelemetry(pipelineType: 'video' | 'image' | 'audio' | 'pdf') {
-    if (!navigator.onLine) return; // Fail silently if fully offline
-
-    try {
-      fetch('https://telemetry-worker.fadytawadrous3.workers.dev/track', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pipeline: pipelineType }),
-        keepalive: true // Crucial: Ensures it sends even if they immediately close the tab
-      });
-    } catch (e) {
-      // Analytics should never crash the app, so we swallow any network errors
-    }
+  if (!navigator.onLine) {
+    console.log('Telemetry skipped: Browser reports offline.');
+    return;
   }
+
+  console.log(`📡 Attempting to send telemetry ping for: ${pipelineType}`);
+
+  try {
+    fetch('https://telemetry-worker.fadytawadrous3.workers.dev/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pipeline: pipelineType })
+      // keepalive temporarily removed for debugging
+    });
+  } catch (e) {
+    console.error('Telemetry fetch failed:', e);
+  }
+}
 
 }
