@@ -95,9 +95,10 @@ export class ConversionService {
           throw new Error(`Processing for ${formatFrom} is not implemented yet.`);
       }
 
+      this.pingTelemetry(type as 'video' | 'image' | 'audio' | 'pdf'); // ping telemetry is fire-and-forget, so we don't await it
+
       // Finalize successful conversion
       this.completeProgress();
-      this.pingTelemetry(this.activeServiceType as 'video' | 'image' | 'audio' | 'pdf'); // ping telemetry is fire-and-forget, so we don't await it
       this.handleDownload(resultBlob, `${file.name.split('.')[0]}_converted.${finalExtension}`);
 
     } catch (err: any) {
