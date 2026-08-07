@@ -9,6 +9,7 @@ import { FormatSelector, FormatOption } from '../../shared/components/format-sel
 import { ProgressBar } from '../../shared/components/progress-bar/progress-bar';
 import { FileSizePipe } from '../../shared/pipes/file-size-pipe';
 import { CropData, ImageCropper } from '../../shared/components/image-cropper/image-cropper';
+import { AnalyticsService } from '../../core/services/analytics-service';
 
 const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
 
@@ -28,6 +29,7 @@ interface ResizePreset {
 })
 export class ImagesComponent implements OnDestroy {
   private imageService = inject(PhotonService);
+  private analytics = inject(AnalyticsService);
 
   selectedFile: File | null = null;
   isProcessing = false;
@@ -201,6 +203,9 @@ export class ImagesComponent implements OnDestroy {
 
     try {
       const processedBlob = await this.imageService.convertAsync(this.selectedFile, this.options);
+
+      // Fire the analytics ping!
+      this.analytics.ping('image');
 
       // Snap progress to 100% when the promise resolves
       clearInterval(this.progressInterval);

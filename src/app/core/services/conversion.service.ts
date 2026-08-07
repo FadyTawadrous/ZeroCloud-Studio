@@ -197,11 +197,11 @@ export class ConversionService {
   console.log(`📡 Attempting to send telemetry ping for: ${pipelineType}`);
 
   try {
-    fetch('https://telemetry-worker.fadytawadrous3.workers.dev/track', {
+    fetch('https://telemetry-worker.fadytawadrous3.workers.dev/status-ping', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ pipeline: pipelineType })
-      // keepalive temporarily removed for debugging
+      body: JSON.stringify({ pipeline: pipelineType }),
+      keepalive: true
     });
   } catch (e) {
     console.error('Telemetry fetch failed:', e);
