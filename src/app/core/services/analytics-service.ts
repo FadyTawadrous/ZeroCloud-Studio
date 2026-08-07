@@ -10,8 +10,6 @@ export class AnalyticsService {
       return;
     }
 
-    console.log(`📡 Sending telemetry ping for: ${pipelineType}`);
-
     try {
       fetch('https://telemetry-worker.fadytawadrous3.workers.dev/status-ping', {
         method: 'POST',

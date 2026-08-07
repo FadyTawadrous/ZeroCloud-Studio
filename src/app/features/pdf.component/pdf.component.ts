@@ -6,6 +6,7 @@ import { PdfConversionOptions } from '../../core/interfaces/ipdf-converter';
 import { DropZone } from '../../shared/components/drop-zone/drop-zone';
 import { FileSizePipe } from '../../shared/pipes/file-size-pipe';
 import { ProgressBar } from '../../shared/components/progress-bar/progress-bar';
+import { AnalyticsService } from '../../core/services/analytics-service';
 
 @Component({
   selector: 'app-pdf.component',
@@ -15,6 +16,7 @@ import { ProgressBar } from '../../shared/components/progress-bar/progress-bar';
 })
 export class PdfComponent implements OnDestroy {
   private pdfService = inject(PdfService);
+  private analytics = inject(AnalyticsService);
 
   selectedFiles: File[] = [];
   isProcessing = false;
@@ -119,6 +121,9 @@ export class PdfComponent implements OnDestroy {
 
     try {
       const resultBlob = await this.pdfService.processAsync(this.selectedFiles, options);
+
+      // Fire the analytics ping!
+      this.analytics.ping('pdf');
 
       clearInterval(this.progressInterval);
       this.progressValue = 100;

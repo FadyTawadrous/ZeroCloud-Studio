@@ -8,6 +8,7 @@ import { DropZone } from '../../shared/components/drop-zone/drop-zone';
 import { FormatSelector, FormatOption } from '../../shared/components/format-selector/format-selector';
 import { ProgressBar } from '../../shared/components/progress-bar/progress-bar';
 import { FileSizePipe } from '../../shared/pipes/file-size-pipe';
+import { AnalyticsService } from '../../core/services/analytics-service';
 
 const MAX_FILE_SIZE_BYTES = 200 * 1024 * 1024; // 200MB limit for audio
 
@@ -26,6 +27,7 @@ const MAX_FILE_SIZE_BYTES = 200 * 1024 * 1024; // 200MB limit for audio
 })
 export class AudioComponent implements OnDestroy {
   private audioService = inject(AudioService);
+  private analytics = inject(AnalyticsService);
 
   selectedFile: File | null = null;
   isProcessing = false;
@@ -146,6 +148,9 @@ export class AudioComponent implements OnDestroy {
     try {
       const processedBlob = await this.audioService.convertAsync(this.selectedFile, this.options);
 
+      // Fire the analytics ping!
+      this.analytics.ping('audio');
+      
       // Snap progress to 100% when the promise resolves
       clearInterval(this.progressInterval);
       this.progressValue = 100;

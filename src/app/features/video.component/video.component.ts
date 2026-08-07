@@ -8,6 +8,7 @@ import { DropZone } from '../../shared/components/drop-zone/drop-zone';
 import { FormatSelector, FormatOption } from '../../shared/components/format-selector/format-selector';
 import { FileSizePipe } from '../../shared/pipes/file-size-pipe';
 import { ProgressBar } from '../../shared/components/progress-bar/progress-bar';
+import { AnalyticsService } from '../../core/services/analytics-service';
 
 const MAX_FILE_SIZE_BYTES = 2000 * 1024 * 1024; // 2GB limit for video
 
@@ -25,6 +26,7 @@ const MAX_FILE_SIZE_BYTES = 2000 * 1024 * 1024; // 2GB limit for video
 })
 export class VideoComponent implements OnDestroy {
   private videoService = inject(MediabunnyService);
+  private analytics = inject(AnalyticsService);
 
   selectedFile: File | null = null;
   isProcessing = false;
@@ -126,6 +128,9 @@ export class VideoComponent implements OnDestroy {
 
     try {
       const processedBlob = await this.videoService.convertAsync(this.selectedFile, this.options);
+
+      // Fire the analytics ping!
+      this.analytics.ping('video');
 
       clearInterval(this.progressInterval);
       this.progressValue = 100;
